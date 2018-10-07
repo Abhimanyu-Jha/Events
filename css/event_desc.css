@@ -1,0 +1,50 @@
+.demo-card-wide.mdl-card {
+  position: absolute;
+  width: 90vw;
+  top:100px;
+  align-self: center;
+  margin-bottom: 20px;
+
+}
+.demo-card-wide > .mdl-card__title {
+  color: #fff;
+  height: 220px;
+  background: url('../images/bg3.jpg') center / cover;
+}
+.demo-card-wide > .mdl-card__menu {
+  color: #fff;
+}
+.mdl-layout__header{
+	box-shadow: none;
+}
+.calendar-button{
+  position: absolute;
+  top:200px;
+  right:5px;
+}
+.mdl-card__title-text{
+	font-size: 36px;
+}
+.card-subheading{
+font-size: 24px;	
+}
+.mdl-card__supporting-text{
+	color:black;
+}
+
+
+.venue{
+	background-color: #C2185B;
+	padding:8px;
+	border-radius: 4px;
+	color:white;
+	font-weight: 200;
+	font-size:18px;
+	width: fit-content;
+}
+.clubname{
+  padding-top: 12px;
+  padding-bottom: 7px;
+  font-size: 20px;
+  color:rgb(120,120,120);
+}

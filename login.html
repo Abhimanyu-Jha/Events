@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#C2185B"/>
+  
+  <!-- BOOTSTRAP CSS-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <!-- Material Icons Stylesheet-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+   <!-- Material Design Stylesheet-->
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.teal-red.min.css" /> 
+  <!-- Events.css Stylesheet-->
+  <link rel="stylesheet" type="text/css" href="/css/events.css">
+  <!-- Custom styles for this template -->
+  <link href="/css/signin.css" rel="stylesheet">
+  <!-- Roboto Font-->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+  <!-- Web App Icon-->
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="192x192" href="/icons/events.png">
+
+  <title>Events Login</title>
+  
+  <link rel="manifest" href="/manifest.json">
+  
+</head>
+<body class="text-center">
+<!-- Simple header with fixed tabs. -->
+<!-- Layout START-->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+            mdl-layout--fixed-tabs">
+
+  <!-- HEADER -->            
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+      <!-- Title -->
+      <span class="mdl-layout-title">Events</span>
+      <div class="mdl-layout-spacer"></div>
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                  mdl-textfield--floating-label mdl-textfield--align-right">
+        
+          <i class="material-icons" onClick="document.location.reload()">refresh</i>
+        
+        
+
+      </div>
+      
+    </div>
+  </header>
+
+  <!-- DRAWER -->
+  <!-- DRAWER -->
+  <div class="mdl-layout__drawer">
+    <div class="drawer-pic">
+    <span class="mdl-layout-title drawer-title"><h3>Events</h3></span>
+    </div>
+    <!-- Icon List -->
+    <ul class="demo-list-icon mdl-list">
+      
+      <li class="mdl-list__item">
+        <span onclick= "location.href='/'" class="mdl-list__item-primary-content">
+        <a href="/" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">home</i>
+        Home</a>
+        </span>
+      </li>
+      <li class="mdl-list__item">
+        <span onclick= "location.href='/auth/login'" class="mdl-list__item-primary-content">
+        <a href="/auth/login" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">account_box</i>
+        Admin Login</a>
+
+        </span>
+      </li>
+      <li onclick= "location.href='/clubs'" class="mdl-list__item">
+        <span class="mdl-list__item-primary-content">
+        <a href="/clubs" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">view_headline</i>
+        Clubs</a>
+
+        </span>
+      </li>
+      <li onclick= "location.href='/dashboard/admin'" class="mdl-list__item">
+        <span class="mdl-list__item-primary-content">
+        <a href="/dashboard/admin" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">dashboard</i>
+        Admin Dashboard</a>
+
+        </span>
+      </li>
+      
+    </ul>
+  </div>
+
+
+<!-- FORM -->
+    <form class="form-signin" action='./google'>
+      <img class="mb-4" src="/icons/events.png" alt="" width="100" height="100">
+      <h1 class="h3 mb-3 font-weight-normal">Login for Club admins</h1><br>
+
+      <!-- <label for="inputEmail" class="sr-only">Email address</label>
+      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+
+      <label for="selectList">Choose club</label>
+      <select id="selectList" class="form-control" style="height: auto;" ">
+      
+      <option>Default select1</option>
+      <option>Default select2</option>
+      <option>Default select3</option>
+      </select>
+      <br>
+      <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+      </div> -->
+      <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect long-button" id='loginbt'>Login with Google</button> -->
+      <a href='/auth/google'><img style='max-width: 270px;' src='/app images/bt1.png' /></a>
+      
+
+
+      
+      
+      <p class="mt-5 mb-3 text-muted">Login page for club administrators to add, view, update or delete events.</p>
+    </form>
+
+
+
+
+
+
+
+<script src="/js/login.js"></script>
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</body>
+</html>

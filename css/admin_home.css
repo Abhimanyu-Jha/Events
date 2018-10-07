@@ -1,0 +1,66 @@
+.headbar{
+	width:100%;
+	background-color: #1976d2;
+	font-size: 24px;
+	padding:8px;
+	text-align: center;
+}
+.mycontainer{
+
+	display:flex;
+	flex-wrap: wrap;
+
+}
+.box1, .box2, .box3, .box4{
+	width: 100%;
+	min-height: 41vh ;
+	text-align:center;
+	cursor:pointer
+}
+
+
+.home-icon{
+	font-size: 150px;
+	text-align:center;
+	color:rgba(255,255,255,0.8);
+}
+
+.home-icon2{
+	font-size: 90px;
+	text-align:center;
+	color:rgba(255,255,255,0.8);
+}
+.box-text{
+	font-size: 35px;
+	text-align:center;
+	color:rgba(255,255,255,0.8);
+	padding:8px 8px 20px 8px;
+}
+
+.new_event{
+	width:100%;
+	cursor: pointer;
+	/*height: 25vh;*/
+	border-radius: 5px;
+	margin: 10px;
+}
+.view_edit_delete{
+	width:100%;
+	cursor: pointer;
+	height: 35vh;
+	border-radius: 5px;
+	margin: 10px;
+	margin-top: 0px
+}
+.a:hover{
+	text-decoration: none;
+
+}
+span, .mdl-list__item{
+	cursor: pointer;
+}
+.holder{
+	width:100%;
+	border-radius: 5px;
+	margin: 8px
+}

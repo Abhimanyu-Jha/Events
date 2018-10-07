@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#C2185B"/>
+  
+  <!-- Material Icons Stylesheet-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+   <!-- Material Design Stylesheet-->
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.teal-red.min.css" /> 
+  <!-- Events.css Stylesheet-->
+  <link rel="stylesheet" type="text/css" href="/css/events.css">
+  <link rel="stylesheet" type="text/css" href="/css/admin_home.css">
+  <!-- Roboto Font-->
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+  
+  <!-- Web App Icon-->
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="213x213" href="/icons/events.png">
+
+  <title>Events</title>
+
+  <link rel="manifest" href="/manifest.json">
+</head>
+
+<body>
+
+<!-- Simple header with fixed tabs. -->
+<!-- Layout START-->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+            mdl-layout--fixed-tabs">
+
+  <!-- HEADER -->            
+  <header class="mdl-layout__header">
+
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">Events</span>
+          <div class="mdl-layout-spacer"></div>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                      mdl-textfield--floating-label mdl-textfield--align-right">
+            <i class="material-icons" onClick="document.location.reload()">refresh</i>
+            <i class="material-icons" onClick="location.href='/auth/logout'">power_settings_new</i>
+            
+          </div>
+          
+        </div>
+     <div class="headbar">SUPERUSER</div>
+  </header>
+
+  <!-- DRAWER -->
+  <!-- DRAWER -->
+  <div class="mdl-layout__drawer">
+    <div class="drawer-pic">
+    <span class="mdl-layout-title drawer-title"><h3>Events</h3></span>
+    </div>
+    <!-- Icon List -->
+    <ul class="demo-list-icon mdl-list">
+      
+      <li class="mdl-list__item">
+        <span onclick= "location.href='/'" class="mdl-list__item-primary-content">
+        <a href="/" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">home</i>
+        Home</a>
+        </span>
+      </li>
+      <li class="mdl-list__item">
+        <span onclick= "location.href='/auth/login'" class="mdl-list__item-primary-content">
+        <a href="/auth/login" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">account_box</i>
+        Admin Login</a>
+
+        </span>
+      </li>
+      <li onclick= "location.href='/clubs'" class="mdl-list__item">
+        <span class="mdl-list__item-primary-content">
+        <a href="/clubs" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">view_headline</i>
+        Clubs</a>
+
+        </span>
+      </li>
+      <li onclick= "location.href='/dashboard/admin'" class="mdl-list__item">
+        <span class="mdl-list__item-primary-content">
+        <a href="/dashboard/admin" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">dashboard</i>
+        Admin Dashboard</a>
+
+        </span>
+      </li>
+      
+    </ul>
+  </div>
+
+
+<!-- <div class="page-content mycontainer">
+
+<div class="box1 agenda1" onclick= "location.href='/dashboard/admin/add'">
+  <div style=''>
+    <br><br>
+  <i class="material-icons home-icon">add</i><div class="box-text">ADD</div>
+  </div>
+</div>
+<div class="box4 agenda4" onclick= "location.href='/dashboard/admin/view'">
+  <div style=''>
+  <br><br><br>
+  <i class="material-icons home-icon2">view_list</i><i class="material-icons home-icon2">mode_edit</i><i class="material-icons home-icon2">delete</i><div class="box-text">VIEW/EDIT/DELETE</div>
+  </div>
+</div>
+
+</div> -->
+<div class='holder'>
+<ul class="demo-list-icon mdl-list" style='background-color: rgba(255,255,255,0.5)'>
+          
+          <li class="mdl-list__item">
+            <span onclick= "location.href='/dashboard/admin/add'" class="mdl-list__item-primary-content">
+            <a href="/dashboard/admin/add" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">add</i>
+            Add Event</a>
+            </span>
+          </li>
+          <li class="mdl-list__item">
+            <span onclick= "location.href='/dashboard/admin/view'" class="mdl-list__item-primary-content">
+            <a href="/dashboard/admin/view" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">view_list</i>
+            View Events</a>
+
+            </span>
+          </li>
+          <li class="mdl-list__item">
+            <span onclick= "location.href='/dashboard/admin/view'" class="mdl-list__item-primary-content">
+            <a href="/dashboard/admin/view" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">mode_edit</i>
+            Edit Events</a>
+
+            </span>
+          </li><li class="mdl-list__item">
+        <span onclick= "location.href='/dashboard/admin/view'" class="mdl-list__item-primary-content">
+        <a href="/dashboard/admin/view" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">delete</i>
+        Delete Events</a>
+
+        </span>
+      </li>
+      <li class="mdl-list__item">
+        <span onclick= "location.href='/dashboard/admin/add_user'" class="mdl-list__item-primary-content">
+        <a href="/dashboard/admin/view" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">person</i>
+        Add Club Coordinator</a>
+
+        </span>
+      </li>
+        </ul>
+      </div>
+
+
+
+</div><!-- Layout close-->
+
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#C2185B"/>
+
+  <!-- Material Icons Stylesheet-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+   <!-- Material Design Stylesheet-->
+  <!--<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.teal-red.min.css" />  -->
+  <link rel ='stylesheet' type='text/css' href='/css/material.min.css'>
+   <!-- FullCalendar Stylesheet-->
+  <link rel='stylesheet' href='/css/fullcalendar.css' type ='text/css'>
+  <!-- Events.css Stylesheet-->
+  <link rel="stylesheet" type="text/css" href="/css/events.css">
+  <!-- Roboto Font-->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type='text/css'>
+  <!-- <link rel="stylesheet" href="/css/roboto.css" type='text/css'> -->
+  <!-- Web App Icon-->
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="213x213" href="/icons/events.png">
+
+
+  
+
+
+  <title>Events</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <style type="text/css">
+    .js-push-btn{
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+
+<!-- Layout START-->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+            mdl-layout--fixed-tabs">
+
+  <!-- HEADER -->            
+  <header class="mdl-layout__header">
+
+    <div class="mdl-layout__header-row">
+      <!-- Title -->
+      <span class="mdl-layout-title">Events</span>
+      <div class="mdl-layout-spacer"></div>
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                  mdl-textfield--floating-label mdl-textfield--align-right">
+        
+          <i class="material-icons refresh" onClick="app.getEvent()" style="cursor:pointer">refresh</i>
+        
+        
+
+      </div>
+      
+    </div>
+    <!-- Tabs -->
+    <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+      <a href="#fixed-tab-1" class="mdl-layout__tab is-active"><i class="material-icons nav-icons">view_agenda</i>CARDS</a>
+      <a href="#fixed-tab-2" class="mdl-layout__tab"><i class="material-icons nav-icons">view_list</i>AGENDA</a>
+      <a href="#fixed-tab-3" class="mdl-layout__tab"><i class="material-icons nav-icons">view_module</i>CALENDAR</a>
+    </div>
+  </header>
+
+  <!-- DRAWER -->
+  <div class="mdl-layout__drawer">
+    <div class="drawer-pic">
+    <span class="mdl-layout-title drawer-title"><h3>Events</h3></span>
+    </div>
+    <!-- Icon List -->
+    <ul class="demo-list-icon mdl-list">
+      
+      <li class="mdl-list__item">
+        <span onclick= "location.href='/'" class="mdl-list__item-primary-content">
+        <a href="/" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">home</i>
+        Home</a>
+        </span>
+      </li>
+      <li class="mdl-list__item">
+        <span onclick= "location.href='/auth/login'" class="mdl-list__item-primary-content">
+        <a href="/auth/login" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">account_box</i>
+        Admin Login</a>
+
+        </span>
+      </li>
+      <li onclick= "location.href='/clubs'" class="mdl-list__item">
+        <span class="mdl-list__item-primary-content">
+        <a href="/clubs" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">view_headline</i>
+        Clubs</a>
+
+        </span>
+      </li>
+      <li onclick= "location.href='/dashboard/admin'" class="mdl-list__item">
+        <span class="mdl-list__item-primary-content">
+        <a href="/dashboard/admin" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">dashboard</i>
+        Admin Dashboard</a>
+
+        </span>
+      </li>
+      <li class="mdl-list__item notification_button">
+        <span class="mdl-list__item-primary-content">
+        <button disabled class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+        Enable Push Messaging
+        </button>
+
+        </span>
+      </li>
+    </ul>
+  </div>
+    
+
+  <!-- CONTENT -->
+  <main class="mdl-layout__content">
+
+      <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
+        <div class="loader">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+          </svg>
+        </div>
+        <div class="page-content page-content1">
+          <!-- TAB1 CARDS-->
+          <!-- Wide card with share menu button -->
+          
+          <div class='mdl-card__supporting-text' id='update_time' style='padding:0px; margin: 0px;'></div>
+          <div class="demo-card-wide mdl-card mdl-shadow--2dp" name='card' hidden>
+            <div class='card-last-updated' hidden></div><!-- FOR KEEPING CARD UPDATED -->
+            <div class='card-key' hidden></div><!-- FOR KEEPING CARD KEY -->
+            <div class="mdl-card__title">
+              <h2 class="mdl-card__title-text"></h2>
+            </div>
+            <button type='submit' class="calendar-button mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+               id='calendar-button'>
+              <i class="material-icons">event</i>
+              </button>
+            
+            <div class='club-name mdl-card__supporting-text' id='club-name'></div>
+            <div class="mdl-card__supporting-text card-subheading"></div>
+
+            <div class="mdl-card__supporting-text desc">
+              
+             
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+              <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect know-more">
+                Know More
+              </a>
+            </div>
+          </div>
+          <div class="padder" style="padding: 8px"></div>   
+
+           
+
+        </div> <!-- tab1 close -->
+      </section>
+
+      <section class="mdl-layout__tab-panel" id="fixed-tab-2">
+        <div class="loader">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+          </svg>
+        </div>
+        <div class="page-content page-content2">
+          <!-- TAB2 -->
+          <div name='acard' class="agenda-card mdl-shadow--2dp" hidden>
+            <div class='card-last-updated2' hidden></div><!-- FOR KEEPING CARD UPDATED -->
+            <div class="agenda-text">
+                <div class="agenda-subtext agenda-heading"></div>
+                <div class="agenda-subtext agenda-date"></div>
+                <div class="agenda-subtext agenda-club"></div>
+                <button class="agenda-button mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                Learn More
+                </button>
+            </div>
+            
+              <div class="agenda-img">
+                  <image src="" class='agenda-img-content' width="128px" height="128px">
+              </div>
+          </div>
+          <div class='padder2' style="padding: 2px"></div>
+          
+
+        </div><!-- TAB2 Close -->
+      </section>
+
+      <section class="mdl-layout__tab-panel" id="fixed-tab-3">
+       <div class="loader" hidden>
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+          </svg>
+        </div>
+        <div class="page-content" style='padding:1px'><!-- TAB3 -->
+            <div style='padding: 7px'>
+                <div class="demo-card-wide mdl-card mdl-shadow--2dp" style='padding: 5px'>
+                <div id='calendar'></div>
+                </div>
+            </div>
+        </div>
+      </section>
+  </main>
+
+
+</div><!-- Layout close-->
+
+
+
+<!-- <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script> -->
+<script type="text/javascript" src='js/material.min.js'></script>
+<script src="js/app.js" async></script>
+<script src="js/client.js"></script>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="js/moment.js"></script>
+<script src='js/fullcalendar.js'></script>
+
+
+
+<script type="text/javascript">
+
+  fetch('/data').then(response=>{
+    return response.json()
+  }).then(data=>{
+    // console.log(data[0].key)
+    today = new Date()
+    events=[]//pass this option to calendar
+    i=0;
+    startCalDate = data[0].date;
+    // console.log(startCalDate);
+    while(i<data.length){
+      endtime = new Date(data[i].date)
+      endtime.setHours(endtime.getHours()+1)
+      obj={
+        title : data[i].title,
+        start : new Date(data[i].date),
+        end   : endtime,
+        url   : '/knowmore/'+data[i].key
+      }
+      events.push(obj);
+      i++;
+    }
+
+    // console.log(events);
+    $(document).ready(function() {
+      $('#calendar').fullCalendar({
+      // put your options and callbacks here
+      //YYYY-MM-DD
+      header: {
+        left: 'title',
+        center: '',
+        right: 'month,listWeek today prev,next'
+      },
+      height:"auto",
+      events: events, //events object made above
+      eventColor: '#C2185B',
+      displayEventTime: false,
+      eventLimit: 2 ,
+      navLinks:true,
+      defaultDate: startCalDate
+
+  })
+
+  });
+  }).catch(err=>{
+    console.log('Error Received', err)
+  })
+</script>
+</body>
+</html>
