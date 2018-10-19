@@ -184,7 +184,7 @@ router.get('/:club/view',(req,res)=>{
 	
 });
 
-//FIX THIS
+//DELETE EVENTS
 router.get('/admin/delete/:key',authCheck,function(req,res){
 	con.query("SELECT * FROM event_data where event_key = ?",[req.params.key],(err,result,fields)=>{
 		console.log(result[0].img);
@@ -342,7 +342,12 @@ router.get('/:club/delete/:key',function(req,res){
 	
 });
 
-
+//ADD CLUB COORDINATOR
+router.get('/admin/add_coordinator',authCheck,(req,res)=>{
+	rootdir=__dirname;
+	rootdir=rootdir.substring(0,rootdir.length -7);
+	res.sendFile(rootdir+'/add_coordinator.html');
+});
 
 
 

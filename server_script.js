@@ -207,7 +207,7 @@ app.get('/login',function(req,res){
 app.use(fileUpload());
 app.post('/upload', urlencodedParser,function(req, res) {
 	if (!req.files)
-    	return res.status(400).send('No files were uploaded.');
+		return res.status(400).send('No files were uploaded.');
     
     	con.query("SELECT * FROM event_data", function (err, result, fields) {
 		    if (err) throw err;
@@ -272,7 +272,13 @@ app.post('/upload', urlencodedParser,function(req, res) {
 		  var curr_date = yyyy+'-'+mm+'-'+dd;
 		  var curr_time = hh+':'+min+':'+ss;
 		  var curr_date_time= curr_date+' '+curr_time;
-		  var club =details.club;
+		  // var club =details.club;
+		  
+		  if(!req.user.superuser==1){
+		  	club=req.user.club
+		  }
+		  	
+
 		  var values=[[,event_name,event_date_time,event_desc,event_imgpath,curr_date_time,event_venue,club]];
 
 		  con.query(sql, [values], function (err, result) {
@@ -594,6 +600,37 @@ app.post('/unsubscribe',(req,res)=>{
 	console.log('Subscription deleted')
 
 });
+
+
+app.post('/add_coordinator', urlencodedParser,function(req, res) {
+
+	  var sql= "INSERT INTO users VALUES ?";
+	  var details=req.body;
+	  user_name=details.cc_name;
+	  club =details.club;
+	  superuser=details.superuser;
+	  user_id=details.user_id;
+	  
+	  
+	  var values=[[,user_id,user_name,club,superuser]];
+
+	  con.query(sql, [values], function (err, result) {
+	    if (err) throw err;
+	    console.log("Coordinator Added");
+	    res.redirect('/dashboard/admin');
+	  });
+	
+});
+
+
+
+
+
+
+
+
+
+
 
 
 
