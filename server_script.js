@@ -276,6 +276,8 @@ app.post('/upload', urlencodedParser,function(req, res) {
 		  
 		  if(!req.user.superuser==1){
 		  	club=req.user.club
+		  }else{
+		  	club =details.club
 		  }
 		  	
 
