@@ -147,10 +147,12 @@
           var i=0;
           
               while(i<data.length) {
-              	if(data[i].club.toLowerCase() == '<%=club%>'){
+              	if(data[i].club.toLowerCase() == '<%=club%>'.toLowerCase()){
               		tablize(data[i]);
               	}
-                 
+                // console.log('/data says ',data[i].club.toLowerCase())
+                // console.log('node<%=club%>')
+                // tablize(data[i])
                 i++;
               };
           
