@@ -128,7 +128,8 @@ self.addEventListener('fetch', function(event) {
         // );
 
 
-        //network first then if fetch FAILS falls back to cache, also update every request made to cache
+        //network first then if fetch FAILS falls back to cache, 
+        //also update every request made to cache
         event.respondWith(
                 fetch(event.request).catch(function() {
                     return caches.match(event.request);

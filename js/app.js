@@ -287,7 +287,7 @@ app.getEvent = function(firstCall) {
           }
         // DELETE IF NOT IN DB CLOSE
       
-      var lastupdate=document.getElementById('update_time');
+      var lastupdate=document.getElementById('time');
       lastupdate.classList.add('backgroundAnimated');
       async function removebg(){
       setTimeout(function(){ 
