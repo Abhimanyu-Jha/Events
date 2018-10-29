@@ -2,7 +2,6 @@
 FROM node:10
 
 WORKDIR /app
-#ENTRYPOINT nodemon
 CMD nodemon server_script.js
 VOLUME /app
 
