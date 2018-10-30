@@ -1,0 +1,21 @@
+//add this file to .gitignore
+
+module.exports ={
+	google:{
+		clientID: "",
+		clientSecret: ""
+	},
+	database:{
+		ip: "localhost",
+		password: "password",
+		user: "root",
+		db: "events"
+	},
+	session:{
+		cookieKey: ""
+	},
+	vapid:{
+		publicVapidKey: "",
+		privateVapidKey: ""
+	}
+};

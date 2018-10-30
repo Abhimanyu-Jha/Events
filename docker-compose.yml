@@ -3,13 +3,15 @@ version: '3'
 services:
   app:
     build: .
-    # uncomment for dev
+    # uncomment for dev:
     # volumes:
     #   - ./:/app
     ports:
       - 8000:8000
     depends_on:
       - mysql
+    # uncomment for dev:
+    # command: nodemon server_script.js
 
   mysql:
     image: mysql:8
