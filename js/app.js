@@ -66,7 +66,7 @@ app.updateEventCard = function(data) {
           start_time=String(hh)+String(mm)+String(ss);
           end_time=String(jj)+String(mm)+String(ss);
 
-          card.querySelector('.calendar-button').setAttribute("onclick","location.href ='https://www.google.com/calendar/render?action=TEMPLATE&text="+data.title+"&dates="+start_date+"T"+start_time+"/"+start_date+"T"+end_time+"&details="+data.club+" Event,+For+details,+link+here:+http://www.example.com&location=IIIT+Delhi+Okhla&trp=false&sf=true&output=xml';");
+          card.querySelector('.calendar-button').setAttribute("onclick","location.href ='https://www.google.com/calendar/render?action=TEMPLATE&text="+data.title+"&dates="+start_date+"T"+start_time+"/"+start_date+"T"+end_time+"&details="+data.club+" Event,+For+details,+link+here:+http://www.example.com&location="+data.venue+"&trp=false&sf=true&output=xml';");
          // SENDING INFO TO GOOGLE CALENDAR close
 
       card.removeAttribute('hidden');
@@ -195,7 +195,7 @@ app.updateEventCard = function(data) {
     start_time=String(hh)+String(mm)+String(ss);
     end_time=String(jj)+String(mm)+String(ss);
 
-    card.querySelector('.calendar-button').setAttribute("onclick","location.href ='https://www.google.com/calendar/render?action=TEMPLATE&text="+data.title+"&dates="+start_date+"T"+start_time+"/"+start_date+"T"+end_time+"&details="+data.club+" Event,+For+details,+link+here:+http://www.example.com&location=IIIT+Delhi+Okhla&trp=false&sf=true&output=xml';");
+    card.querySelector('.calendar-button').setAttribute("onclick","location.href ='https://www.google.com/calendar/render?action=TEMPLATE&text="+data.title+"&dates="+start_date+"T"+start_time+"/"+start_date+"T"+end_time+"&details="+data.club+" Event,+For+details,+link+here:+http://www.example.com&location="+data.venue+"&trp=false&sf=true&output=xml';");
   // SENDING INFO TO GOOGLE CALENDAR close
   if (app.isLoading) {
     app.spinners[0].setAttribute('hidden', true);
