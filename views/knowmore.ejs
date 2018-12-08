@@ -138,7 +138,7 @@
           start_time=String(hh)+String(mm)+String(ss);
           end_time=String(jj)+String(mm)+String(ss);
   
-  document.querySelector('.calendar-button').setAttribute("onclick","location.href ='https://www.google.com/calendar/render?action=TEMPLATE&text="+'<%= data.title %>'+"&dates="+start_date+"T"+start_time+"/"+start_date+"T"+end_time+"&details="+'<%= data.club %>'+" Event,+For+details,+link+here:+http://www.example.com&location=IIIT+Delhi+Okhla&trp=false&sf=true&output=xml';");
+  document.querySelector('.calendar-button').setAttribute("onclick","location.href ='https://www.google.com/calendar/render?action=TEMPLATE&text="+'<%= data.title %>'+"&dates="+start_date+"T"+start_time+"/"+start_date+"T"+end_time+"&details="+'<%= data.club %>'+" Event,+For+details,+link+here:+http://www.example.com&location="+'<%=data.venue%>'+"&trp=false&sf=true&output=xml';");
   main=document.getElementById('main-card');
   main.setAttribute('style',"background: url('../images/"+'<%= data.img %>'+"') center / cover;'")
 </script>
