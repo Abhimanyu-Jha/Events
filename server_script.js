@@ -612,7 +612,9 @@ app.post('/add_coordinator', urlencodedParser,function(req, res) {
 	  club =details.club;
 	  superuser=details.superuser;
 	  user_id=details.user_id;
-	  
+	  if (superuser==1){
+	  	club='admin'
+	  }
 	  
 	  var values=[[,user_id,user_name,club,superuser]];
 

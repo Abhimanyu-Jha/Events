@@ -350,16 +350,4 @@ router.get('/admin/add_coordinator',authCheck,(req,res)=>{
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 module.exports=router;
