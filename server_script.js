@@ -637,15 +637,14 @@ app.post('/add_coordinator', urlencodedParser,function(req, res) {
 
 
 
-
 // 404 if no other route
 app.use(function (req, res) {
   res.status(404).sendFile(__dirname+'/404.html');
 })
 
-
+const ip = require("ip"); // gets local IP
 var port = process.env.PORT || 8000
-app.listen(port, function(){
-	console.log('Running now on localhost:'+port);
 
+app.listen(port, function() {
+	console.log('Running now on ' + ip.address() + ":" + port);
 });

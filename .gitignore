@@ -1,4 +1,7 @@
 /node_modules
 /config/keys.js
-/images
+/images/*
 /Presentation
+*.sw[pon]
+
+!/images/.gitkeep
