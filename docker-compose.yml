@@ -13,7 +13,11 @@ services:
     depends_on:
       - mysql       
 
-    command: ./wait-for-it.sh -t 90 mysql:3306 -- nodemon src/server_script.js # waits for mysql server to start listening on default port before we run our script
+    command: bash -c "cd ./src && ../wait-for-it.sh -t 180 mysql:3306 -- nodemon server_script.js" 
+                   # This waits for mysql server to start listening on default port 
+                   # (with a timeou) before we run nodemon
+                   # The above is a little ugly. bash -c is needed because o/w we can't use `cd`
+                   # We have to use cd because o/w relative paths don't work correctly
 
   mysql:
     image: mysql:8
