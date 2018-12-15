@@ -42,16 +42,43 @@ app.use(passport.session());
 app.set('view engine','ejs');
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
-var con = mysql.createConnection({
-  host: keys.database.ip,
-  user: keys.database.user,
-  password: keys.database.password,
-  database: keys.database.db
-});
-con.connect(function(err) {
-	  if (err) throw err;
-	  console.log('Connected to DB');
-});
+
+var db_config={
+	host: keys.database.ip,
+	user: keys.database.user,
+	password: keys.database.password,
+	database: keys.database.db
+};
+var con = mysql.createConnection(db_config);
+
+function handleDisconnect(){
+
+	var con = mysql.createConnection(db_config);
+
+
+	con.connect(function(err) {
+		  if (err){
+		      console.log('Error Connecting to DB');
+		      setTimeout(handleDisconnect,2000);
+		      // We introduce a delay before attempting to reconnect,
+              // to avoid a hot loop, and to allow our node script to
+              // process asynchronous requests in the meantime.
+		  }
+		  console.log('Connected to DB');
+	});
+
+	con.on('error',function(err){
+		console.log('DB error',err);
+		if (err.code==='PROTOCOL_CONNECTION_LOST') {
+			handleDisconnect();
+		}else{
+			throw err;
+		}
+	});
+}
+
+handleDisconnect()
+
 
 //DELETE OLD EVENTS
 function deleteOldEvents(){
@@ -524,8 +551,7 @@ app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
 			    club: result[i].club,
 			    venue: result[i].venue
 
-			};
-			
+			};			
 			data.push(Eventinfo);
 			i++;
 		};
