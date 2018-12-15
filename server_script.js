@@ -404,6 +404,8 @@ app.post('/update', urlencodedParser,function(req, res) {
 			event_name=details.event_name;
 			event_time=details.event_time;
 			event_date=details.event_date;
+			//date validation
+			
 			event_date_time=event_date+' '+event_time
 			event_desc=details.event_desc;
 			event_venue=details.event_venue; 

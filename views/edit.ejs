@@ -98,31 +98,43 @@
   <!-- CONTENT -->
 <main class="mdl-layout__content">
     <form style="padding:25px;" id='uploadForm' action='/update' 
-    method='post' encType="multipart/form-data">
+    method='post' encType="multipart/form-data" class="needs-validation" novalidate>
 
         <div class="form-group row" >
             <div class='col'>
             <label for="event-name">Event Name</label>
-            <input type="text" name='event_name' value="<%= data.title %>" class="form-control" id="event-name" aria-describedby="EventName" placeholder="Enter event name">
+            <input type="text" name='event_name' value="<%= data.title %>" class="form-control" id="event-name" aria-describedby="EventName" placeholder="Enter event name" required>
+            <div class="invalid-feedback">
+          Please choose a username.
+        </div>
             </div>
             <div class='col'>
             <label for="event-key">Event Key</label>
-            <input readonly="true" type="text" name='event_key' value="<%= data.key %>"class="form-control" id="event-key" aria-describedby="EventKey" placeholder="Key">
+            <input readonly="true" type="text" name='event_key' value="<%= data.key %>"class="form-control" id="event-key" aria-describedby="EventKey" placeholder="Key" required>
             </div>
         </div>
         <div class="row form-group">
             <div class="col">
             <label for="event-date">Event Date</label>
-            <input type="date" name='event_date' value="<%= data.date %>"class="form-control" id="event-date" aria-describedby="Event date">
+            <input type="date" name='event_date' value="<%= data.date %>"class="form-control" id="event-date" aria-describedby="Event date" required>
+            <div class="invalid-feedback">
+          Please enter a valid date.
+          </div>
             </div>
             <div class="col">
             <label for="event-time">Event Time</label>
-            <input type="time" name='event_time' value="<%= data.time %>" class="form-control" id="event-time" aria-describedby="Event time">
+            <input type="time" name='event_time' value="<%= data.time %>" class="form-control" id="event-time" aria-describedby="Event time" required>
+            <div class="invalid-feedback">
+          Please enter valid time.
+          </div>
             </div>  
         </div>
         <div class="form-group">
           <label for="event-description">Event Description</label>
-          <textarea class="form-control" name='event_desc' id="event-description" rows="3"><%= data.description %></textarea>
+          <textarea class="form-control" name='event_desc' id="event-description" rows="3"><%= data.description %></textarea required>
+          <div class="invalid-feedback">
+          Please enter event description.
+          </div>
         </div>
 
         <div class="input-group mb-3">
@@ -144,11 +156,14 @@
         <div class="row form-group">
             <div class="col-7">
             <label for="event-venue">Event Venue</label>
-            <input type="text" name='event_venue' value="<%= data.venue %>" class="form-control" id="event-venue" aria-describedby="Event Venue">
+            <input type="text" name='event_venue' value="<%= data.venue %>" class="form-control" id="event-venue" aria-describedby="Event Venue" required>
+            <div class="invalid-feedback">
+            Please select venue.
+            </div>
             </div>
             <div class="col-5">
               <label for="club">Club Name</label>
-              <select name='club' id='club' class="custom-select">
+              <select name='club' id='club' class="custom-select" required>
               
               <option value="<%= data.club %>" selected ><%= data.club %></option> 
             </select>
@@ -188,6 +203,26 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<script>
+//JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
 
 </body>
 </html>
