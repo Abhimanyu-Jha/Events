@@ -27,13 +27,11 @@ CREATE TABLE event_data (
 
 CREATE TABLE subscriptions (
   serial_number int(45) NOT NULL AUTO_INCREMENT,
-  user_id VARCHAR(100) NOT NULL,
-  username VARCHAR(45) DEFAULT NULL,
-  club VARCHAR(45) DEFAULT NULL,
-  superuser int(1) NOT NULL,
+  comments varchar(100) DEFAULT NULL,
+  subscription_obj longtext NOT NULL,
 
   PRIMARY KEY (serial_number)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE users (
   serial_number int(45) NOT NULL AUTO_INCREMENT,
