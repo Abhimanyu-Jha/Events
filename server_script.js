@@ -388,7 +388,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 // USE THIS FOR UPDATING ON SERVER
 app.post('/update', urlencodedParser,function(req, res) {
 	if (!req.files){
-		console.log('Image not changed');
+		console.log('Image not specified');
 	}
     else{
     	var details=req.body;
@@ -397,9 +397,8 @@ app.post('/update', urlencodedParser,function(req, res) {
     	//and store it in old_imgpath
     	con.query('SELECT * FROM event_data WHERE `event_key`='+event_key+';', (err,result,fields)=>{
 			old_imgpath=result[0].img;
-			fs.unlink(__dirname+'/images/'+old_imgpath,(err)=>{
-			if(err) throw err;
-			});
+
+			
 
 			// console.log(details);
 			event_name=details.event_name;
@@ -410,6 +409,10 @@ app.post('/update', urlencodedParser,function(req, res) {
 			event_venue=details.event_venue; 
 
 			if(req.files.event_image){
+				//if new image uploaded remove old one.
+				fs.unlink(__dirname+'/images/'+old_imgpath,(err)=>{
+				if(err) throw err;
+				});
 				event_image=req.files.event_image;
 				filename= req.files.event_image.name;
 				extension=filename.slice(filename.indexOf('.'));
@@ -422,6 +425,8 @@ app.post('/update', urlencodedParser,function(req, res) {
 				 
 				    // res.redirect('../');
 				});	
+			}else{
+				event_imgpath=old_imgpath;
 			}
 
 				
