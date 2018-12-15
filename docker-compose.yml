@@ -7,6 +7,9 @@ services:
       - ./:/app/src # /app will be our deployment directory and has additional files 
                     # created during `docker build` (such as node_modules)
                     # /app/src is where we mount the source and will run it
+    environment:
+      - TZ=Asia/Kolkata
+
     ports:
       - 8000:8000   # expose port 8000. The script will output its local ip when run,
                     # and you can access the running web-app at ip:8000
@@ -26,8 +29,10 @@ services:
     volumes:
       - ./schema:/docker-entrypoint-initdb.d # mount initial schema
       - mysql-data:/var/lib/mysql   # persist data
-    ports:
-      - 3306:3306
+    environment:
+      - TZ=Asia/Kolkata
+    expose:
+      - 3306
 
 volumes:
   mysql-data:
