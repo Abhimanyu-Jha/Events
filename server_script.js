@@ -390,129 +390,148 @@ app.post('/update', urlencodedParser,function(req, res) {
 	if (!req.files){
 		console.log('Image not changed');
 	}
-    
-	var details=req.body;
-	// console.log(details);
-	event_key= details.event_key;
-	event_name=details.event_name;
-	event_time=details.event_time;
-	event_date=details.event_date;
-	event_date_time=event_date+' '+event_time
-	event_desc=details.event_desc;
-	event_venue=details.event_venue; 
+    else{
+    	var details=req.body;
+    	event_key= details.event_key;
+    	//Get old image name (whose key is event_key)
+    	//and store it in old_imgpath
+    	con.query('SELECT * FROM event_data WHERE `event_key`='+event_key+';', (err,result,fields)=>{
+			old_imgpath=result[0].img;
+			fs.unlink(__dirname+'/images/'+old_imgpath,(err)=>{
+			if(err) throw err;
+			});
 
-	if(req.files.event_image){
-		event_image=req.files.event_image;
-		filename= req.files.event_image.name;
-		extension=filename.slice(filename.indexOf('.'));
-		event_imgpath=event_key+extension;
-		console.log(event_imgpath);
+			// console.log(details);
+			event_name=details.event_name;
+			event_time=details.event_time;
+			event_date=details.event_date;
+			event_date_time=event_date+' '+event_time
+			event_desc=details.event_desc;
+			event_venue=details.event_venue; 
 
-		event_image.mv(__dirname+'/images/'+event_imgpath, function(err) {
-			if (err)
-		    	retures.status(500).send(err);
-		 
-		    // res.redirect('../');
-		});	
-	}
+			if(req.files.event_image){
+				event_image=req.files.event_image;
+				filename= req.files.event_image.name;
+				extension=filename.slice(filename.indexOf('.'));
+				event_imgpath=event_key+extension;
+				console.log(event_imgpath);
 
-		
+				event_image.mv(__dirname+'/images/'+event_imgpath, function(err) {
+					if (err)
+				    	retures.status(500).send(err);
+				 
+				    // res.redirect('../');
+				});	
+			}
+
 				
+						
 
 
 
-	var today = new Date();
-	var dd = today.getDate();
-	var mm = today.getMonth()+1; //January is 0!
-	var yyyy = today.getFullYear();
+			var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1; //January is 0!
+			var yyyy = today.getFullYear();
 
-	var hh = today.getHours();
-	var min= today.getMinutes();
-	var ss = today.getSeconds();
+			var hh = today.getHours();
+			var min= today.getMinutes();
+			var ss = today.getSeconds();
 
-	if(dd<10){
-	dd='0'+dd;
-	} 
-	if(mm<10){
-	mm='0'+mm;
-	}
-	var curr_date = yyyy+'-'+mm+'-'+dd;
-	var curr_time = hh+':'+min+':'+ss;
-	var curr_date_time= curr_date+' '+curr_time;
-	var club =details.club;
-	event_desc = event_desc.replace(/'/gi,"\'");
+			if(dd<10){
+			dd='0'+dd;
+			} 
+			if(mm<10){
+			mm='0'+mm;
+			}
+			var curr_date = yyyy+'-'+mm+'-'+dd;
+			var curr_time = hh+':'+min+':'+ss;
+			var curr_date_time= curr_date+' '+curr_time;
+			var club =details.club;
+			event_desc = event_desc.replace(/'/gi,"\'");
+			
+			var sql= "UPDATE `event_data` SET title = ?, img = ?, date= ?,description= ?, created=?, venue= ?, club= ? WHERE `event_key` = ?";
+
+			//var sql ="UPDATE event_data SET description = '"+event_desc+"' WHERE event_key = '"+event_key+"';"
+			var values=[event_name,event_imgpath,event_date_time,event_desc,curr_date_time,event_venue,club, event_key];
+			con.query(sql,values, function (err, result) {
+			    if (err) throw err;
+			    console.log("Event Updated");
+			    //	************************************************
+				//	SEND NOTIFICATION
+				//	************************************************
+
+				const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+				    edate=new Date(event_date_time);
+				  	dayName = edate.toString().split(' ')[0];
+				  	monthName= monthNames[edate.getMonth()];
+				  	d= edate.getDate();
+				  	function nth(d) {
+					    if(d>3 && d<21) return 'th'; 
+					    switch (d % 10) {
+					          case 1:  return "st";
+					          case 2:  return "nd";
+					          case 3:  return "rd";
+					          default: return "th";
+					    }
+					}
+				    function formatAMPM(date) {
+					    var hours = date.getHours();
+					    var minutes = date.getMinutes();
+					    var ampm = hours >= 12 ? 'pm' : 'am';
+					    hours = hours % 12;
+					    hours = hours ? hours : 12; // the hour '0' should be '12'
+					    minutes = minutes < 10 ? '0'+minutes : minutes;
+					    var strTime = hours + ':' + minutes + '' + ampm;
+					    return strTime;
+				    }
+				    time=formatAMPM(edate);
+
+				    edate=dayName+' '+monthName+' '+d+nth(d)+' '+time;
+
+				const payload = JSON.stringify({
+					title: event_name+' by '+club+" has been updated.",
+					options:{
+						body: 'There has been some change(s) in '+event_name+' by '+club+'. Visit the event page to know more.',
+						icon: '/icons/events.png',
+						badge: '/icons/monochrome1.png',
+						vibrate: [500,110,500,110,450,110,200,110,170,40,450,110,200,110,170,40,500], // STAR WARS
+						actions: [
+				        {
+				          action: "knowmore",
+				          title: 'Know More'					         
+				        }
+						],
+						data: {event_key: event_key}
+					}
+					
+					
+				});
+
+				con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
+					// console.log(result[0].subscription_obj);
+					i=0;
+					while(i<result.length){
+						subscription = JSON.parse(result[i].subscription_obj);
+						webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
+						i++;
+					}
+					
+				});
+			    res.redirect('../dashboard/view');
+			});
+
+
+
+
+
+
+
+		});
+    	
+    }
+
 	
-	var sql= "UPDATE `event_data` SET title = ?, date= ?,description= ?, created=?, venue= ?, club= ? WHERE `event_key` = ?";
-
-	//var sql ="UPDATE event_data SET description = '"+event_desc+"' WHERE event_key = '"+event_key+"';"
-	var values=[event_name,event_date_time,event_desc,curr_date_time,event_venue,club, event_key];
-	con.query(sql,values, function (err, result) {
-	    if (err) throw err;
-	    console.log("Event Updated");
-	    //	************************************************
-		//	SEND NOTIFICATION
-		//	************************************************
-
-		const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-		    edate=new Date(event_date_time);
-		  	dayName = edate.toString().split(' ')[0];
-		  	monthName= monthNames[edate.getMonth()];
-		  	d= edate.getDate();
-		  	function nth(d) {
-			    if(d>3 && d<21) return 'th'; 
-			    switch (d % 10) {
-			          case 1:  return "st";
-			          case 2:  return "nd";
-			          case 3:  return "rd";
-			          default: return "th";
-			    }
-			}
-		    function formatAMPM(date) {
-			    var hours = date.getHours();
-			    var minutes = date.getMinutes();
-			    var ampm = hours >= 12 ? 'pm' : 'am';
-			    hours = hours % 12;
-			    hours = hours ? hours : 12; // the hour '0' should be '12'
-			    minutes = minutes < 10 ? '0'+minutes : minutes;
-			    var strTime = hours + ':' + minutes + '' + ampm;
-			    return strTime;
-		    }
-		    time=formatAMPM(edate);
-
-		    edate=dayName+' '+monthName+' '+d+nth(d)+' '+time;
-
-		const payload = JSON.stringify({
-			title: event_name+' by '+club+" has been updated.",
-			options:{
-				body: 'There has been some change(s) in '+event_name+' by '+club+'. Visit the event page to know more.',
-				icon: '/icons/events.png',
-				badge: '/icons/monochrome1.png',
-				vibrate: [500,110,500,110,450,110,200,110,170,40,450,110,200,110,170,40,500], // STAR WARS
-				actions: [
-		        {
-		          action: "knowmore",
-		          title: 'Know More'					         
-		        }
-				],
-				data: {event_key: event_key}
-			}
-			
-			
-		});
-
-		con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
-			// console.log(result[0].subscription_obj);
-			i=0;
-			while(i<result.length){
-				subscription = JSON.parse(result[i].subscription_obj);
-				webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
-				i++;
-			}
-			
-		});
-	    res.redirect('../dashboard/view');
-	});
-
 	
 });
 
@@ -533,8 +552,32 @@ app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
 	
 	  con.query("SELECT * FROM event_data", function (err, result, fields) {
 	    if (err) throw err;
-	    
-	    console.log('Data Requested');
+	    var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth()+1; //January is 0!
+		var yyyy = today.getFullYear();
+
+		var hh = today.getHours();
+		var min= today.getMinutes();
+		var ss = today.getSeconds();
+
+		function twodigit(x){
+			if(x<10){
+				x='0'+x;
+			}
+			return x
+		};
+
+		mm= twodigit(mm);
+		dd= twodigit(dd);
+		hh= twodigit(hh);
+		min= twodigit(min);
+		ss= twodigit(ss);
+		var curr_date = dd+'-'+mm+'-'+yyyy;
+		var curr_time = hh+':'+min+':'+ss;
+		var curr_date_time= curr_date+' '+curr_time;
+
+	    console.log('['+curr_date_time+']','Data Requested');
 
 	    // console.log(result[0]);
 	    // data=[initialEventinfo];
