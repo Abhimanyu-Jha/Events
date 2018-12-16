@@ -24,13 +24,12 @@ services:
 
   mysql:
     image: mysql:8
-    environment:
-      - MYSQL_ROOT_PASSWORD=password # just because mysql complains if this isn't set
     volumes:
       - ./schema:/docker-entrypoint-initdb.d # mount initial schema
       - mysql-data:/var/lib/mysql   # persist data
     environment:
       - TZ=Asia/Kolkata
+      - MYSQL_ROOT_PASSWORD=password # just because mysql complains if this isn't set
     expose:
       - 3306
 
