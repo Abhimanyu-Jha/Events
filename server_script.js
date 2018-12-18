@@ -49,38 +49,81 @@ var db_config={
 	password: keys.database.password,
 	database: keys.database.db
 };
-var con = mysql.createConnection(db_config);
 
-function handleDisconnect(){
+// var con = mysql.createConnection(db_config);	
+// con.connect(err=>{
+// 	if(err){
+// 		throw err;
+// 	}else{
+// 		var tday=new Date;
+// 		console.log('Connected to DB at '+tday);
+// 	}
+// });
 
-	var con = mysql.createConnection(db_config);
+//Using pool instead of single connections 
+var mysql_pool  = mysql.createPool({
+  connectionLimit : 100,
+  host: keys.database.ip,
+	user: keys.database.user,
+	password: keys.database.password,
+	database: keys.database.db
+});
+
+// function startConnection(){
+// 	mysql_pool.getConnection(function(err, connection){
+// 	if (err) {
+// 		throw err;
+// 	}
+// 	console.log('Connected to DB');
+// 	return connection;
+// 	})
+// }
 
 
-	con.connect(function(err) {
-		  if (err){
-		      console.log('Error Connecting to DB');
-		      setTimeout(handleDisconnect,2000);
-		      // We introduce a delay before attempting to reconnect,
-              // to avoid a hot loop, and to allow our node script to
-              // process asynchronous requests in the meantime.
-		  }
-		  console.log('Connected to DB');
-	});
 
-	con.on('error',function(err){
-		console.log('DB error',err);
-		if (err.code==='PROTOCOL_CONNECTION_LOST') {
-			handleDisconnect();
-		}else{
-			throw err;
-		}
-	});
-}
 
-handleDisconnect()
+// var con=startConnection();
+// function handleDisconnect(){
 
+// 	var tday=new Date;
+// 	con.connect(function(err) {
+// 		  if (err){
+// 		      console.log('Error Connecting to DB\n['+tday+']');
+// 		      setTimeout(handleDisconnect,2000);
+// 		      // We introduce a delay before attempting to reconnect,
+//               // to avoid a hot loop, and to allow our node script to
+//               // process asynchronous requests in the meantime.
+// 		  }
+// 		  console.log('Connected to DB');
+// 	});
+
+// 	con.on('error',function(err){
+
+// 		console.log('DB error\n['+tday+']',err);
+// 		if (err.code==='PROTOCOL_CONNECTION_LOST') {
+// 			handleDisconnect();
+// 		}else{
+// 			console.log('Error\n['+tday+']',err);
+// 			throw err;
+// 			handleDisconnect();
+// 		}
+// 	});
+// }
+// handleDisconnect();
+
+// setInterval(function () {
+//     con.query('SELECT 1');
+// }, 5000);
 
 //DELETE OLD EVENTS
+mysql_pool.getConnection(function(err, con){
+		if (err) {
+			throw err;
+		}
+		console.log('Connected to DB using #1 con from pool');
+		//Now do whatever you want with this connection obtained from the pool
+});
+
 function deleteOldEvents(){
 	var today = new Date();
 	var dd = today.getDate();
@@ -105,33 +148,48 @@ function deleteOldEvents(){
 	var curr_date_time= curr_date+' '+curr_time;
 // console.log('Current Date Time > '+curr_date_time);
 
+	mysql_pool.getConnection(function(err, con){
+		if (err) {
+			throw err;
+			return;			
+		}
+		// console.log('Connected to DB');
 
-sql="SELECT * FROM event_data WHERE date < '"+curr_date_time+"' ;";
-con.query(sql,function(err,result){
-	var i=0;
-	imgpaths=[];
-	while(i<result.length){
-		imgpaths.push(result[i].img)
-		i++;
-	}
-	// console.log(imgpaths)
+		//Now do whatever you want with this connection obtained from the pool
 
-	sql="DELETE FROM event_data WHERE date < '"+curr_date_time+"' ;"
-	con.query(sql,function(){
-	// console.log('Old Events Deleted');
+		sql="SELECT * FROM event_data WHERE date < '"+curr_date_time+"' ;";
+		con.query(sql,function(err,result){
+			if (err) {
+				console.log('oops');
+				con_delete.release();
+				setTimeout(startConnection,2000);
+				return;
+			};
+			var i=0;
+			imgpaths=[];
+			while(i<result.length){
+				imgpaths.push(result[i].img)
+				i++;
+			}
+			// console.log(imgpaths)
 
-	// ALSO DELETE OLD PIXXXXXXXXX
-	rootdir=__dirname;
-	i=0;
-	while(i<imgpaths.length){
-		fs.unlink(rootdir+'/images/'+imgpaths[i],(err)=>{
-		if(err) throw err;
+			sql="DELETE FROM event_data WHERE date < '"+curr_date_time+"' ;"
+			con.query(sql,function(){
+			// console.log('Old Events Deleted');
+
+			// ALSO DELETE OLD PIXXXXXXXXX
+			rootdir=__dirname;
+			i=0;
+			while(i<imgpaths.length){
+				fs.unlink(rootdir+'/images/'+imgpaths[i],(err)=>{
+				if(err) throw err;
+				});
+				i++;
+			}
+			
+			});
 		});
-		i++;
-	}
-	
-});
-})
+	});
 
 
 
@@ -152,19 +210,93 @@ app.use(bodyParser.json());
 app.get('/',function(req,res){
 	res.sendFile(__dirname +'/index.html')
 });
-// app.get('/test',function(req,res){
-// 	res.sendFile(__dirname +'/view_events.html')
-// });
-// app.get('/hackeve',function(req,res){
-// 	res.sendFile(__dirname +'/event_desc.html')
-// });
+//SERVING JSON DB DATA
+app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
+	mysql_pool.getConnection(function(err, con){
+		if (err) {
+			throw err;
+			return;
+		}
+		// console.log('Connection for /data opened');
+		//Now do whatever you want with this connection obtained from the pool
+		con.query("SELECT * FROM event_data", function (err, result, fields) {
+		    if (err) throw err;
+		    var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1; //January is 0!
+			var yyyy = today.getFullYear();
+
+			var hh = today.getHours();
+			var min= today.getMinutes();
+			var ss = today.getSeconds();
+
+			function twodigit(x){
+				if(x<10){
+					x='0'+x;
+				}
+				return x
+			};
+
+			mm= twodigit(mm);
+			dd= twodigit(dd);
+			hh= twodigit(hh);
+			min= twodigit(min);
+			ss= twodigit(ss);
+			var curr_date = dd+'-'+mm+'-'+yyyy;
+			var curr_time = hh+':'+min+':'+ss;
+			var curr_date_time= curr_date+' '+curr_time;
+
+		    console.log('['+curr_date_time+']','Data Requested');
+
+		    // console.log(result[0]);
+		    // data=[initialEventinfo];
+		    data=[];
+			var i=0;
+			while(i<result.length){
+				var Eventinfo={
+					created: result[i].created,
+				    key: result[i].event_key,
+				    title: result[i].title,
+				    date: result[i].date,
+				    description:result[i].description,
+				    img: result[i].img,
+				    club: result[i].club,
+				    venue: result[i].venue
+
+				};			
+				data.push(Eventinfo);
+				i++;
+			};
+			//Now order objects in data by 'date' i.e. data[i].date before sending
+			var i;
+			var len=data.length;
+			for (i = 0; i < data.length; i++){
+				for(j=0; j<len-1; j++){
+					if (data[j].date>data[j+1].date){
+						var temp=data[j+1];
+						data[j+1] = data[j];
+						data[j] = temp;
+					}
+				}
+				len--;
+			}
+
+			res.send(data);
+    	});
+	});	  
+});
 app.get('/knowmore/:key',function(req,res){
 	if(req.params.key == 'undefined'){
 		res.status(400).sendFile(__dirname+'/404.html');
 		return;
 	}
-	
-	con.query("SELECT * FROM event_data where event_key="+req.params.key, function (err, result, fields) {
+	mysql_pool.getConnection(function(err, con){
+		if (err) {
+			throw err;
+		}
+		// console.log('Connected to DB');
+		//Now do whatever you want with this connection obtained from the pool
+		con.query("SELECT * FROM event_data where event_key="+req.params.key, function (err, result, fields) {
 	    if (!result[0]) {
 	    	console.log('404');
 	    	res.status(400).sendFile(__dirname+'/404.html');
@@ -214,7 +346,8 @@ app.get('/knowmore/:key',function(req,res){
 			    venue: result[i].venue
 			};
 	
-	res.render('knowmore',{key: req.params.key, data});
+		res.render('knowmore',{key: req.params.key, data});
+		});
 	});
 });
 app.get('/login',function(req,res){
@@ -542,88 +675,7 @@ app.post('/update', urlencodedParser,function(req, res) {
 	
 });
 
-//SERVING JSON DB DATA
-app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
-	var initialEventinfo ={
-    created: 'October 13, 2015 11:13:00',
-    key: '986',
-    title: 'Hackeve',
-    date: '2015-04-16T07:52:00',
-    description: 'This session will serve as an introduction to reactive front end frameworks. React, Angular and Vue.js are a few of the most popular frameworks which fall in this category...',
-    img: 'bg4.jpg',
-    club: 'Byld',
-    venue: 'Library'
-	};
-	
 
-	
-	  con.query("SELECT * FROM event_data", function (err, result, fields) {
-	    if (err) throw err;
-	    var today = new Date();
-		var dd = today.getDate();
-		var mm = today.getMonth()+1; //January is 0!
-		var yyyy = today.getFullYear();
-
-		var hh = today.getHours();
-		var min= today.getMinutes();
-		var ss = today.getSeconds();
-
-		function twodigit(x){
-			if(x<10){
-				x='0'+x;
-			}
-			return x
-		};
-
-		mm= twodigit(mm);
-		dd= twodigit(dd);
-		hh= twodigit(hh);
-		min= twodigit(min);
-		ss= twodigit(ss);
-		var curr_date = dd+'-'+mm+'-'+yyyy;
-		var curr_time = hh+':'+min+':'+ss;
-		var curr_date_time= curr_date+' '+curr_time;
-
-	    console.log('['+curr_date_time+']','Data Requested');
-
-	    // console.log(result[0]);
-	    // data=[initialEventinfo];
-	    data=[];
-		var i=0;
-		while(i<result.length){
-			var Eventinfo={
-				created: result[i].created,
-			    key: result[i].event_key,
-			    title: result[i].title,
-			    date: result[i].date,
-			    description:result[i].description,
-			    img: result[i].img,
-			    club: result[i].club,
-			    venue: result[i].venue
-
-			};			
-			data.push(Eventinfo);
-			i++;
-		};
-		//Now order objects in data by 'date' i.e. data[i].date before sending
-		var i;
-		var len=data.length;
-		for (i = 0; i < data.length; i++){
-			for(j=0; j<len-1; j++){
-				if (data[j].date>data[j+1].date){
-					var temp=data[j+1];
-					data[j+1] = data[j];
-					data[j] = temp;
-				}
-			}
-			len--;
-		}
-
-		res.send(data);
-
-	  });
-
-	});
 
 
 // Setting up routes
