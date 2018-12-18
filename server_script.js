@@ -15,7 +15,7 @@ const keys = require('./config/keys')
 const cookieSession =require('cookie-session');
 const passport = require('passport');
 
-
+var getConnection = require('./db_pool');
 
 
 const authCheck = (req,res,next)=>{
@@ -61,13 +61,14 @@ var db_config={
 // });
 
 //Using pool instead of single connections 
-var mysql_pool  = mysql.createPool({
-  connectionLimit : 100,
-  host: keys.database.ip,
-	user: keys.database.user,
-	password: keys.database.password,
-	database: keys.database.db
-});
+// var mysql_pool  = mysql.createPool({
+//     connectionLimit : 100,
+//     host: keys.database.ip,
+// 	user: keys.database.user,
+// 	password: keys.database.password,
+// 	database: keys.database.db
+// });
+
 
 // function startConnection(){
 // 	mysql_pool.getConnection(function(err, connection){
@@ -116,7 +117,7 @@ var mysql_pool  = mysql.createPool({
 // }, 5000);
 
 //DELETE OLD EVENTS
-mysql_pool.getConnection(function(err, con){
+getConnection(function(err, con){
 		if (err) {
 			throw err;
 		}
@@ -148,9 +149,9 @@ function deleteOldEvents(){
 	var curr_date_time= curr_date+' '+curr_time;
 // console.log('Current Date Time > '+curr_date_time);
 
-	mysql_pool.getConnection(function(err, con){
+	getConnection(function(err, con){
 		if (err) {
-			throw err;
+			// throw err;
 			return;			
 		}
 		// console.log('Connected to DB');
@@ -212,7 +213,7 @@ app.get('/',function(req,res){
 });
 //SERVING JSON DB DATA
 app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
-	mysql_pool.getConnection(function(err, con){
+	getConnection(function(err, con){
 		if (err) {
 			throw err;
 			return;
@@ -290,7 +291,7 @@ app.get('/knowmore/:key',function(req,res){
 		res.status(400).sendFile(__dirname+'/404.html');
 		return;
 	}
-	mysql_pool.getConnection(function(err, con){
+	getConnection(function(err, con){
 		if (err) {
 			throw err;
 		}
@@ -368,158 +369,163 @@ app.use(fileUpload());
 app.post('/upload', urlencodedParser,function(req, res) {
 	if (!req.files)
 		return res.status(400).send('No files were uploaded.');
-    
-    	con.query("SELECT * FROM event_data", function (err, result, fields) {
-		    if (err) throw err;
-		    
-		    if(result.length==0){
-		    	console.log('DB is empty')
-		    	con.query('ALTER TABLE event_data AUTO_INCREMENT = 1;')
-		    	var key=1;
-		    }else{
-		    	console.log('The last record is');
-		    	console.log(result[result.length-1]);
-		   		prevkey=result[result.length-1].event_key;
-		    	var key=prevkey+1;
-		    }
-		    
+    	getConnection(function(err, con){
+			if (err) {
+				throw err;
+			}
+			//Now do whatever you want with this connection obtained from the pool
 		
-		console.log('key is '+key);
-		event_image=req.files.event_image;
-		
-		filename=req.files.event_image.name;
-		extension=filename.slice(filename.indexOf('.'));
-		console.log(filename);
-		// console.log(extension);
-		event_image.mv(__dirname+'/images/'+key+extension, function(err) {
-		    if (err)
-		      return res.status(500).send(err);
-		 
-		     res.redirect('../');
-		});
-		
-		
-		// var key=1;
-		
-		
-		  var sql= "INSERT INTO event_data VALUES ?";
-		  var details=req.body;
-		  event_name=details.event_name;
-		  event_time=details.event_time;
-		  event_date=details.event_date;
-		  
-		  event_date_time=event_date+' '+event_time
+	    	con.query("SELECT * FROM event_data", function (err, result, fields) {
+			    if (err) throw err;
+			    
+			    if(result.length==0){
+			    	console.log('DB is empty')
+			    	con.query('ALTER TABLE event_data AUTO_INCREMENT = 1;')
+			    	var key=1;
+			    }else{
+			    	console.log('The last record is');
+			    	console.log(result[result.length-1]);
+			   		prevkey=result[result.length-1].event_key;
+			    	var key=prevkey+1;
+			    }
+			    
+			
+				console.log('key is '+key);
+				event_image=req.files.event_image;
+			
+				filename=req.files.event_image.name;
+				extension=filename.slice(filename.indexOf('.'));
+				console.log(filename);
+				// console.log(extension);
+				event_image.mv(__dirname+'/images/'+key+extension, function(err) {
+			    	if (err)
+			      		return res.status(500).send(err);
+			 
+			     	res.redirect('../');
+				});
+			
+			
+				// var key=1;
+			
+			
+			  	var sql= "INSERT INTO event_data VALUES ?";
+			  	var details=req.body;
+			  	event_name=details.event_name;
+			  	event_time=details.event_time;
+			  	event_date=details.event_date;
+			  
+			 	event_date_time=event_date+' '+event_time
 
-		  event_desc=details.event_desc;
-		  event_imgpath=key+extension;
-		  event_venue=details.event_venue;
+			  	event_desc=details.event_desc;
+			  	event_imgpath=key+extension;
+			  	event_venue=details.event_venue;
 
-		  var today = new Date();
-		  var dd = today.getDate();
-		  var mm = today.getMonth()+1; //January is 0!
-	      var yyyy = today.getFullYear();
+				var today = new Date();
+				var dd = today.getDate();
+				var mm = today.getMonth()+1; //January is 0!
+				var yyyy = today.getFullYear();
 
-	      var hh = today.getHours();
-	      var min= today.getMinutes();
-	      var ss = today.getSeconds();
+				var hh = today.getHours();
+				var min= today.getMinutes();
+				var ss = today.getSeconds();
 
-	      if(dd<10){
-			dd='0'+dd;
-		  } 
-		  if(mm<10){
-			mm='0'+mm;
-		  }
-		  var curr_date = yyyy+'-'+mm+'-'+dd;
-		  var curr_time = hh+':'+min+':'+ss;
-		  var curr_date_time= curr_date+' '+curr_time;
-		  // var club =details.club;
-		  
-		  if(!req.user.superuser==1){
-		  	club=req.user.club
-		  }else{
-		  	club =details.club
-		  }
-		  	
+				if(dd<10){
+				dd='0'+dd;
+				} 
+				if(mm<10){
+				mm='0'+mm;
+				}
+				var curr_date = yyyy+'-'+mm+'-'+dd;
+				var curr_time = hh+':'+min+':'+ss;
+				var curr_date_time= curr_date+' '+curr_time;
+				// var club =details.club;
 
-		  var values=[[,event_name,event_date_time,event_desc,event_imgpath,curr_date_time,event_venue,club]];
+				if(!req.user.superuser==1){
+					club=req.user.club
+				}else{
+					club =details.club
+				}
+			  	
 
-		  con.query(sql, [values], function (err, result) {
-		    if (err) throw err;
-		    console.log("Event Added");
-		    newkey=result.insertId;
-		    values=[newkey+extension,newkey];
-		    con.query("UPDATE event_data SET img =? WHERE `event_key` = ?",values);
-		    fs.rename(__dirname+"/images/"+key+extension,__dirname+"/images/"+newkey+extension,(err)=>{
-		    	if (err) throw err;
+			 	var values=[[,event_name,event_date_time,event_desc,event_imgpath,curr_date_time,event_venue,club]];
 
-				//	************************************************
-				//	SEND NOTIFICATION
-				//	************************************************
+			    con.query(sql, [values], function (err, result) {
+			    	if (err) throw err;
+			    	console.log("Event Added");
+			    	newkey=result.insertId;
+			    	values=[newkey+extension,newkey];
+			    	con.query("UPDATE event_data SET img =? WHERE `event_key` = ?",values);
+			    	fs.rename(__dirname+"/images/"+key+extension,__dirname+"/images/"+newkey+extension,(err)=>{
+			    		if (err) throw err;
 
-				const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-				    edate=new Date(event_date_time);
-				  	dayName = edate.toString().split(' ')[0];
-				  	monthName= monthNames[edate.getMonth()];
-				  	d= edate.getDate();
-				  	function nth(d) {
-					    if(d>3 && d<21) return 'th'; 
-					    switch (d % 10) {
-					          case 1:  return "st";
-					          case 2:  return "nd";
-					          case 3:  return "rd";
-					          default: return "th";
+						//	************************************************
+						//	SEND NOTIFICATION
+						//	************************************************
+
+						const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+					    edate=new Date(event_date_time);
+					  	dayName = edate.toString().split(' ')[0];
+					  	monthName= monthNames[edate.getMonth()];
+					  	d= edate.getDate();
+					  	function nth(d) {
+						    if(d>3 && d<21) return 'th'; 
+						    switch (d % 10) {
+						          case 1:  return "st";
+						          case 2:  return "nd";
+						          case 3:  return "rd";
+						          default: return "th";
+						    }
+						}
+					    function formatAMPM(date) {
+						    var hours = date.getHours();
+						    var minutes = date.getMinutes();
+						    var ampm = hours >= 12 ? 'pm' : 'am';
+						    hours = hours % 12;
+						    hours = hours ? hours : 12; // the hour '0' should be '12'
+						    minutes = minutes < 10 ? '0'+minutes : minutes;
+						    var strTime = hours + ':' + minutes + '' + ampm;
+						    return strTime;
 					    }
-					}
-				    function formatAMPM(date) {
-					    var hours = date.getHours();
-					    var minutes = date.getMinutes();
-					    var ampm = hours >= 12 ? 'pm' : 'am';
-					    hours = hours % 12;
-					    hours = hours ? hours : 12; // the hour '0' should be '12'
-					    minutes = minutes < 10 ? '0'+minutes : minutes;
-					    var strTime = hours + ':' + minutes + '' + ampm;
-					    return strTime;
-				    }
-				    time=formatAMPM(edate);
+					    time=formatAMPM(edate);
 
-				    edate=dayName+' '+monthName+' '+d+nth(d)+' '+time;
+					    edate=dayName+' '+monthName+' '+d+nth(d)+' '+time;
 
-				const payload = JSON.stringify({
-					title: "Event "+event_name+' by '+club,
-					options:{
-						body: 'New Event on '+edate+' \nVenue: '+event_venue,
-						icon: 'icons/events.png',
-						badge: 'icons/monochrome1.png',
-						vibrate: [500,110,500,110], // STAR WARS
-						actions: [
-					        {
-					          action: "knowmore",
-					          title: 'Know More'					         
-					        }
-					      ],
-					    data: {event_key: newkey}
-					}
-				});
+						const payload = JSON.stringify({
+							title: "Event "+event_name+' by '+club,
+							options:{
+								body: 'New Event on '+edate+' \nVenue: '+event_venue,
+								icon: 'icons/events.png',
+								badge: 'icons/monochrome1.png',
+								vibrate: [500,110,500,110], // STAR WARS
+								actions: [
+							        {
+							          action: "knowmore",
+							          title: 'Know More'					         
+							        }
+							      ],
+							    data: {event_key: newkey}
+							}
+						});
 
-				con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
-					// console.log(result[0].subscription_obj);
-					i=0;
-					while(i<result.length){
-						subscription = JSON.parse(result[i].subscription_obj);
-						webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
-						i++;
-					}
-					
-				});
-				
-
-		    });
-		  });
+						con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
+							// console.log(result[0].subscription_obj);
+							i=0;
+							while(i<result.length){
+								subscription = JSON.parse(result[i].subscription_obj);
+								webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
+								i++;
+							}
+							
+						});
+			    	});
+			    });
+			});
 		});
+
 });
 
 // USE THIS FOR UPDATING ON SERVER
-app.post('/update', urlencodedParser,function(req, res) {
+app.post('/update', urlencodedParser,function(req, res){
 	if (!req.files){
 		console.log('Image not specified');
 	}
@@ -528,11 +534,13 @@ app.post('/update', urlencodedParser,function(req, res) {
     	event_key= details.event_key;
     	//Get old image name (whose key is event_key)
     	//and store it in old_imgpath
-    	con.query('SELECT * FROM event_data WHERE `event_key`='+event_key+';', (err,result,fields)=>{
+    	getConnection(function(err, con){
+			if (err) {
+				throw err;
+			}
+			//Now do whatever you want with this connection obtained from the pool
+			con.query('SELECT * FROM event_data WHERE `event_key`='+event_key+';',(err,result,fields)=>{
 			old_imgpath=result[0].img;
-
-			
-
 			// console.log(details);
 			event_name=details.event_name;
 			event_time=details.event_time;
@@ -546,7 +554,7 @@ app.post('/update', urlencodedParser,function(req, res) {
 			if(req.files.event_image){
 				//if new image uploaded remove old one.
 				fs.unlink(__dirname+'/images/'+old_imgpath,(err)=>{
-				if(err) throw err;
+					if(err) throw err;
 				});
 				event_image=req.files.event_image;
 				filename= req.files.event_image.name;
@@ -563,12 +571,6 @@ app.post('/update', urlencodedParser,function(req, res) {
 			}else{
 				event_imgpath=old_imgpath;
 			}
-
-				
-						
-
-
-
 			var today = new Date();
 			var dd = today.getDate();
 			var mm = today.getMonth()+1; //January is 0!
@@ -643,9 +645,7 @@ app.post('/update', urlencodedParser,function(req, res) {
 				        }
 						],
 						data: {event_key: event_key}
-					}
-					
-					
+					}	
 				});
 
 				con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
@@ -656,23 +656,14 @@ app.post('/update', urlencodedParser,function(req, res) {
 						webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
 						i++;
 					}
-					
 				});
 			    res.redirect('../dashboard/view');
 			});
-
-
-
-
-
-
-
+		});
 		});
     	
+    	
     }
-
-	
-	
 });
 
 
@@ -703,7 +694,14 @@ app.post('/subscribe',(req,res)=>{
 	//Get subscription object
 	//Add to Database sub obj for each user
 	const subscription = req.body;
-	con.query('INSERT INTO subscriptions (subscription_obj) VALUES ?',[[[JSON.stringify(subscription)]]]);
+	getConnection(function(err, con){
+		if (err) {
+			throw err;
+		}
+		//Now do whatever you want with this connection obtained from the pool
+		con.query('INSERT INTO subscriptions (subscription_obj) VALUES ?',[[[JSON.stringify(subscription)]]]);
+	});
+	
 	// console.log(subscription);
 	//Resource created
 	res.status(201).json({});
@@ -725,7 +723,14 @@ app.post('/subscribe',(req,res)=>{
 app.post('/unsubscribe',(req,res)=>{
 
 	const subscription = req.body;
-	con.query('DELETE FROM subscriptions WHERE subscription_obj =?',[[[JSON.stringify(subscription)]]]);
+	getConnection(function(err, con){
+		if (err) {
+			throw err;
+		}
+		//Now do whatever you want with this connection obtained from the mysql_pool
+		con.query('DELETE FROM subscriptions WHERE subscription_obj =?',[[[JSON.stringify(subscription)]]]);
+	});
+	
 	// console.log(subscription);
 	console.log('Subscription deleted')
 
@@ -734,23 +739,29 @@ app.post('/unsubscribe',(req,res)=>{
 
 app.post('/add_coordinator', urlencodedParser,function(req, res) {
 
-	  var sql= "INSERT INTO users VALUES ?";
-	  var details=req.body;
-	  user_name=details.cc_name;
-	  club =details.club;
-	  superuser=details.superuser;
-	  user_id=details.user_id;
-	  if (superuser==1){
-	  	club='admin'
-	  }
-	  
-	  var values=[[,user_id,user_name,club,superuser]];
+	var sql= "INSERT INTO users VALUES ?";
+	var details=req.body;
+	user_name=details.cc_name;
+	club =details.club;
+	superuser=details.superuser;
+	user_id=details.user_id;
+	if (superuser==1){
+		club='admin'
+	}
 
-	  con.query(sql, [values], function (err, result) {
-	    if (err) throw err;
-	    console.log("Coordinator Added");
-	    res.redirect('/dashboard/admin');
-	  });
+	var values=[[,user_id,user_name,club,superuser]];
+	getConnection(function(err, con){
+		if (err) {
+			throw err;
+		}
+		//Now do whatever you want with this connection obtained from the pool
+		con.query(sql, [values], function (err, result) {
+			if (err) throw err;
+			console.log("Coordinator Added");
+			res.redirect('/dashboard/admin');
+		});	
+	});
+	
 	
 });
 

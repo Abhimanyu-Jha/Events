@@ -2,14 +2,17 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const keys =require('./keys')
 const mysql = require('mysql');
-var con = mysql.createConnection({
-			host: keys.database.ip,
-			user: keys.database.user,
-			password: keys.database.password,
-			database: keys.database.db
-		});
-con.connect();
-
+var getConnection = require('../db_pool');
+// var con = mysql.createConnection({
+// 			host: keys.database.ip,
+// 			user: keys.database.user,
+// 			password: keys.database.password,
+// 			database: keys.database.db
+// 		});
+// con.connect();
+// con.on('error',function(){
+// 	console.log('hi error #2')
+// });
 
 passport.serializeUser((user,done)=>{
 	done(null,user.user_id);
@@ -17,11 +20,19 @@ passport.serializeUser((user,done)=>{
 
 passport.deserializeUser((id,done)=>{
 	var sql= "SELECT * FROM users WHERE user_id = "+id;
-	con.query(sql, function (err, result) {
+	getConnection(function(err, con){
+		if (err) {
+			throw err;
+		}
+		
+		//Now do whatever you want with this connection obtained from the pool
+		con.query(sql, function (err, result) {
 		    if (err) throw err;
 		    user=result[0];
 			done(null,user);
+		});
 	});
+	
 	
 });
 
@@ -46,44 +57,29 @@ passport.use(
 		// var thumbnail= profile._json.img.url
 
 		var sql1= "SELECT * FROM users WHERE user_id = "+googleID;
-		con.query(sql1, function (err, result) {
-		    if (err) throw err;
-		    // console.log(result);
-		    if(result.length!=0){
-		    	console.log("************************");
-		    	console.log('Welcome user > ' + result[0].username+ ' ('+result[0].club+')');
-		    	console.log("************************");
-		    	done(null,result[0]);
+		getConnection(function(err, con){
+			if (err) {
+				throw err;
+			}
+			//Now do whatever you want with this connection obtained from the pool
+			con.query(sql1, function (err, result) {
+			    if (err) throw err;
+			    // console.log(result);
+			    if(result.length!=0){
+			    	console.log("************************");
+			    	console.log('Welcome user > ' + result[0].username+ ' ('+result[0].club+')');
+			    	console.log("************************");
+			    	done(null,result[0]);
 
-		    }else{
+			    }else{
 
-		  		console.log('************************')
-		  		console.log('You are not authorised!!')
-		  		console.log('************************')
-		        done(null,false);
-		    }
+			  		console.log('************************')
+			  		console.log('You are not authorised!!')
+			  		console.log('************************')
+			        done(null,false);
+			    }
+			});	
 		});
-
 		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	}
 ));
