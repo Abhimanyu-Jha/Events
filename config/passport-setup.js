@@ -31,6 +31,7 @@ passport.deserializeUser((id,done)=>{
 		    user=result[0];
 			done(null,user);
 		});
+		con.release();
 	});
 	
 	
@@ -78,7 +79,8 @@ passport.use(
 			  		console.log('************************')
 			        done(null,false);
 			    }
-			});	
+			});
+			con.release();	
 		});
 		
 	}

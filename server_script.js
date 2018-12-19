@@ -43,80 +43,7 @@ app.set('view engine','ejs');
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-var db_config={
-	host: keys.database.ip,
-	user: keys.database.user,
-	password: keys.database.password,
-	database: keys.database.db
-};
 
-// var con = mysql.createConnection(db_config);	
-// con.connect(err=>{
-// 	if(err){
-// 		throw err;
-// 	}else{
-// 		var tday=new Date;
-// 		console.log('Connected to DB at '+tday);
-// 	}
-// });
-
-//Using pool instead of single connections 
-// var mysql_pool  = mysql.createPool({
-//     connectionLimit : 100,
-//     host: keys.database.ip,
-// 	user: keys.database.user,
-// 	password: keys.database.password,
-// 	database: keys.database.db
-// });
-
-
-// function startConnection(){
-// 	mysql_pool.getConnection(function(err, connection){
-// 	if (err) {
-// 		throw err;
-// 	}
-// 	console.log('Connected to DB');
-// 	return connection;
-// 	})
-// }
-
-
-
-
-// var con=startConnection();
-// function handleDisconnect(){
-
-// 	var tday=new Date;
-// 	con.connect(function(err) {
-// 		  if (err){
-// 		      console.log('Error Connecting to DB\n['+tday+']');
-// 		      setTimeout(handleDisconnect,2000);
-// 		      // We introduce a delay before attempting to reconnect,
-//               // to avoid a hot loop, and to allow our node script to
-//               // process asynchronous requests in the meantime.
-// 		  }
-// 		  console.log('Connected to DB');
-// 	});
-
-// 	con.on('error',function(err){
-
-// 		console.log('DB error\n['+tday+']',err);
-// 		if (err.code==='PROTOCOL_CONNECTION_LOST') {
-// 			handleDisconnect();
-// 		}else{
-// 			console.log('Error\n['+tday+']',err);
-// 			throw err;
-// 			handleDisconnect();
-// 		}
-// 	});
-// }
-// handleDisconnect();
-
-// setInterval(function () {
-//     con.query('SELECT 1');
-// }, 5000);
-
-//DELETE OLD EVENTS
 getConnection(function(err, con){
 		if (err) {
 			throw err;
@@ -125,6 +52,8 @@ getConnection(function(err, con){
 		//Now do whatever you want with this connection obtained from the pool
 });
 
+
+//DELETE OLD EVENTS
 function deleteOldEvents(){
 	var today = new Date();
 	var dd = today.getDate();
@@ -189,7 +118,9 @@ function deleteOldEvents(){
 			}
 			
 			});
+
 		});
+		con.release();
 	});
 
 
@@ -284,8 +215,11 @@ app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
 
 			res.send(data);
     	});
+    	con.release();
 	});	  
 });
+
+
 app.get('/knowmore/:key',function(req,res){
 	if(req.params.key == 'undefined'){
 		res.status(400).sendFile(__dirname+'/404.html');
@@ -349,6 +283,7 @@ app.get('/knowmore/:key',function(req,res){
 	
 		res.render('knowmore',{key: req.params.key, data});
 		});
+		con.release();
 	});
 });
 app.get('/login',function(req,res){
@@ -520,6 +455,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 			    	});
 			    });
 			});
+			con.release();
 		});
 
 });
@@ -660,6 +596,7 @@ app.post('/update', urlencodedParser,function(req, res){
 			    res.redirect('../dashboard/view');
 			});
 		});
+		con.release();
 		});
     	
     	
@@ -700,6 +637,7 @@ app.post('/subscribe',(req,res)=>{
 		}
 		//Now do whatever you want with this connection obtained from the pool
 		con.query('INSERT INTO subscriptions (subscription_obj) VALUES ?',[[[JSON.stringify(subscription)]]]);
+		con.release();
 	});
 	
 	// console.log(subscription);
@@ -729,6 +667,7 @@ app.post('/unsubscribe',(req,res)=>{
 		}
 		//Now do whatever you want with this connection obtained from the mysql_pool
 		con.query('DELETE FROM subscriptions WHERE subscription_obj =?',[[[JSON.stringify(subscription)]]]);
+		con.release();
 	});
 	
 	// console.log(subscription);
@@ -760,6 +699,7 @@ app.post('/add_coordinator', urlencodedParser,function(req, res) {
 			console.log("Coordinator Added");
 			res.redirect('/dashboard/admin');
 		});	
+		con.release();
 	});
 	
 	

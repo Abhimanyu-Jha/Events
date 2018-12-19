@@ -123,6 +123,7 @@ router.get('/admin/edit/:key',authCheck,function(req,res){
 		
 			res.render('edit',{key: req.params.key, data});
 		});
+		con.release();
 	});
 });
 router.get('/:club/edit/:key',function(req,res){
@@ -179,6 +180,7 @@ router.get('/:club/edit/:key',function(req,res){
 					};
 				res.render('edit',{key: req.params.key, data,club: req.params.club});
 			});
+			con.release();
 		});
 
 		
@@ -285,6 +287,7 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 			
 		});		
 	})
+	con.release();
 	});
 	
 });
@@ -372,6 +375,7 @@ router.get('/:club/delete/:key',function(req,res){
 				
 				});		
 				})
+				con.release();
 			});
 			
 	}
