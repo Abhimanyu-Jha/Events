@@ -76,10 +76,15 @@ router.get('/:club/add',(req,res)=>{
 router.get('/admin/edit/:key',authCheck,function(req,res){
 	getConnection(function(err, con){
 		if (err) {
+			con.release(); 
 			throw err;
 		}
 		//Now do whatever you want with this connection obtained from the pool
 		con.query("SELECT * FROM event_data where event_key="+req.params.key, function (err, result, fields) {
+			if (err) {
+				con.release();
+				throw err;
+			}
 		    if (!result[0]) {
 		    	console.log('404');
 		    	res.status(400).sendFile(__dirname+'/404.html');
@@ -122,8 +127,9 @@ router.get('/admin/edit/:key',authCheck,function(req,res){
 				};
 		
 			res.render('edit',{key: req.params.key, data});
+			con.release();
 		});
-		con.release();
+		
 	});
 });
 router.get('/:club/edit/:key',function(req,res){
@@ -138,6 +144,10 @@ router.get('/:club/edit/:key',function(req,res){
 			}
 			//Now do whatever you want with this connection obtained from the pool
 			con.query("SELECT * FROM event_data where event_key="+req.params.key, function (err, result, fields) {
+				if (err) {
+					con.release();
+					throw err;
+				}	
 			    if (!result[0]) {
 			    	console.log('404');
 			    	res.status(400).sendFile(__dirname+'/404.html');
@@ -179,8 +189,9 @@ router.get('/:club/edit/:key',function(req,res){
 					    venue: result[i].venue
 					};
 				res.render('edit',{key: req.params.key, data,club: req.params.club});
+				con.release();
 			});
-			con.release();
+			
 		});
 
 		
@@ -216,6 +227,10 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 		}
 		//Now do whatever you want with this connection obtained from the pool
 		con.query("SELECT * FROM event_data where event_key = ?",[req.params.key],(err,result,fields)=>{
+			if (err) {
+				con.release();
+				throw err;
+			}
 		console.log(result[0].img);
 		event_name = result[0].title;
 		club=result[0].club;
@@ -224,6 +239,10 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 		var imgpath= result[0].img;
 		key=req.params.key;
 		con.query("DELETE FROM event_data where event_key="+req.params.key, function (err, result, fields) {
+			if (err) {
+				con.release();
+				throw err;
+			}
 			rootdir=__dirname;
 			rootdir=rootdir.substring(0,rootdir.length -7);
 			fs.unlink(rootdir+'/images/'+imgpath,(err)=>{
@@ -272,6 +291,11 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 				});
 
 				con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
+					if (err) {
+						con.release();
+						throw err;
+					}
+					con.release();
 					// console.log(result[0].subscription_obj);
 					i=0;
 					while(i<result.length){
@@ -287,7 +311,6 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 			
 		});		
 	})
-	con.release();
 	});
 	
 });
@@ -304,6 +327,10 @@ router.get('/:club/delete/:key',function(req,res){
 				}
 				//Now do whatever you want with this connection obtained from the pool
 				con.query("SELECT * FROM event_data where event_key = ?",[req.params.key],(err,result,fields)=>{
+					if (err) {
+						con.release();
+						throw err;
+					}
 				console.log(result[0].img);
 				event_name = result[0].title;
 				club=result[0].club;
@@ -312,6 +339,10 @@ router.get('/:club/delete/:key',function(req,res){
 				var imgpath= result[0].img;
 				key=req.params.key;
 				con.query("DELETE FROM event_data where event_key="+req.params.key, function (err, result, fields) {
+					if (err) {
+					con.release();
+					throw err;
+				}
 					rootdir=__dirname;
 					rootdir=rootdir.substring(0,rootdir.length -7);
 					fs.unlink(rootdir+'/images/'+imgpath,(err)=>{
@@ -360,6 +391,10 @@ router.get('/:club/delete/:key',function(req,res){
 						});
 
 						con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
+							if (err) {
+								throw err;
+							}
+							con.release();
 							// console.log(result[0].subscription_obj);
 							i=0;
 							while(i<result.length){
@@ -375,7 +410,6 @@ router.get('/:club/delete/:key',function(req,res){
 				
 				});		
 				})
-				con.release();
 			});
 			
 	}

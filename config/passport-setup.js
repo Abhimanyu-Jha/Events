@@ -28,10 +28,11 @@ passport.deserializeUser((id,done)=>{
 		//Now do whatever you want with this connection obtained from the pool
 		con.query(sql, function (err, result) {
 		    if (err) throw err;
+		    con.release();
 		    user=result[0];
 			done(null,user);
 		});
-		con.release();
+		
 	});
 	
 	
@@ -64,6 +65,7 @@ passport.use(
 			}
 			//Now do whatever you want with this connection obtained from the pool
 			con.query(sql1, function (err, result) {
+				con.release();	
 			    if (err) throw err;
 			    // console.log(result);
 			    if(result.length!=0){
@@ -80,7 +82,7 @@ passport.use(
 			        done(null,false);
 			    }
 			});
-			con.release();	
+			
 		});
 		
 	}

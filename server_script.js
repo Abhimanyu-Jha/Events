@@ -151,7 +151,11 @@ app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
 		// console.log('Connection for /data opened');
 		//Now do whatever you want with this connection obtained from the pool
 		con.query("SELECT * FROM event_data", function (err, result, fields) {
-		    if (err) throw err;
+		    if (err){
+		    	con.release()
+		    	throw err;
+		    }
+		    con.release();
 		    var today = new Date();
 			var dd = today.getDate();
 			var mm = today.getMonth()+1; //January is 0!
@@ -214,7 +218,7 @@ app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
 
 			res.send(data);
     	});
-    	con.release();
+    	
 	});	  
 });
 
@@ -226,19 +230,24 @@ app.get('/knowmore/:key',function(req,res){
 	}
 	getConnection(function(err, con){
 		if (err) {
+			con.release()
 			throw err;
 		}
 		// console.log('Connected to DB');
 		//Now do whatever you want with this connection obtained from the pool
 		con.query("SELECT * FROM event_data where event_key="+req.params.key, function (err, result, fields) {
-	    if (!result[0]) {
-	    	console.log('404');
-	    	res.status(400).sendFile(__dirname+'/404.html');
-	    	return;
-	    	// throw err;
-	    }
-	    
-	    data=[];
+			if (err) {
+				con.release();
+				throw err;
+			}
+		    if (!result[0]) {
+		    	console.log('404');
+		    	res.status(400).sendFile(__dirname+'/404.html');
+		    	return;
+		    	// throw err;
+		    }
+	    	con.release();
+	    	data=[];
 		    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 			    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 			  edate=new Date(result[0].date);
@@ -267,22 +276,22 @@ app.get('/knowmore/:key',function(req,res){
 			  time=formatAMPM(edate);
 
 			  edate=dayName+' '+monthName+' '+d+nth(d)+' '+time;
-		var i=0;
-		var data={
-				created: result[i].created,
-			    key: result[i].event_key,
-			    title: result[i].title,
-			    date: edate,
-			    gdate: result[i].date,
-			    description:result[i].description,
-			    img: result[i].img,
-			    club: result[i].club,
-			    venue: result[i].venue
-			};
+			var i=0;
+			var data={
+					created: result[i].created,
+				    key: result[i].event_key,
+				    title: result[i].title,
+				    date: edate,
+				    gdate: result[i].date,
+				    description:result[i].description,
+				    img: result[i].img,
+				    club: result[i].club,
+				    venue: result[i].venue
+				};
 	
-		res.render('knowmore',{key: req.params.key, data});
-		});
-		con.release();
+			res.render('knowmore',{key: req.params.key, data});
+			});
+		
 	});
 });
 // app.get('/login',authCheck,function(req,res){
@@ -306,16 +315,27 @@ app.post('/upload', urlencodedParser,function(req, res) {
 		return res.status(400).send('No files were uploaded.');
     	getConnection(function(err, con){
 			if (err) {
+				con.release();
 				throw err;
 			}
 			//Now do whatever you want with this connection obtained from the pool
 		
 	    	con.query("SELECT * FROM event_data", function (err, result, fields) {
-			    if (err) throw err;
+			    if (err){
+			    	con.release();
+			    	throw err;
+			    		
+			    } 
 			    
 			    if(result.length==0){
 			    	console.log('DB is empty')
-			    	con.query('ALTER TABLE event_data AUTO_INCREMENT = 1;')
+			    	con.query('ALTER TABLE event_data AUTO_INCREMENT = 1;',(err)=>{
+			    		if (err) {
+			    			con.release();
+			    			throw err;	
+			    		}
+			    		
+			    	})
 			    	var key=1;
 			    }else{
 			    	console.log('The last record is');
@@ -385,11 +405,20 @@ app.post('/upload', urlencodedParser,function(req, res) {
 			 	var values=[[,event_name,event_date_time,event_desc,event_imgpath,curr_date_time,event_venue,club]];
 
 			    con.query(sql, [values], function (err, result) {
-			    	if (err) throw err;
+			    	if (err) {
+			    		con.release();
+			    		throw err;
+			    	}
 			    	console.log("Event Added");
 			    	newkey=result.insertId;
 			    	values=[newkey+extension,newkey];
-			    	con.query("UPDATE event_data SET img =? WHERE `event_key` = ?",values);
+			    	con.query("UPDATE event_data SET img =? WHERE `event_key` = ?",values,(err)=>{
+			    		if (err) {
+			    			con.release();
+			    			throw err;
+			    		}
+			    		
+			    	});
 			    	fs.rename(__dirname+"/images/"+key+extension,__dirname+"/images/"+newkey+extension,(err)=>{
 			    		if (err) throw err;
 
@@ -443,6 +472,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 						});
 
 						con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
+							con.release();
 							// console.log(result[0].subscription_obj);
 							i=0;
 							while(i<result.length){
@@ -455,7 +485,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 			    	});
 			    });
 			});
-			con.release();
+			
 		});
 
 });
@@ -472,10 +502,15 @@ app.post('/update', urlencodedParser,function(req, res){
     	//and store it in old_imgpath
     	getConnection(function(err, con){
 			if (err) {
+				con.release();
 				throw err;
 			}
 			//Now do whatever you want with this connection obtained from the pool
 			con.query('SELECT * FROM event_data WHERE `event_key`='+event_key+';',(err,result,fields)=>{
+				if (err) {
+					con.release();
+					throw err;
+				}
 			old_imgpath=result[0].img;
 			// console.log(details);
 			event_name=details.event_name;
@@ -533,7 +568,11 @@ app.post('/update', urlencodedParser,function(req, res){
 			//var sql ="UPDATE event_data SET description = '"+event_desc+"' WHERE event_key = '"+event_key+"';"
 			var values=[event_name,event_imgpath,event_date_time,event_desc,curr_date_time,event_venue,club, event_key];
 			con.query(sql,values, function (err, result) {
-			    if (err) throw err;
+			    if (err){
+			    	con.release();
+			    	throw err;
+
+			    }
 			    console.log("Event Updated");
 			    //	************************************************
 				//	SEND NOTIFICATION
@@ -585,6 +624,7 @@ app.post('/update', urlencodedParser,function(req, res){
 				});
 
 				con.query('SELECT * FROM subscriptions', (err,result,fields)=>{
+					con.release()
 					// console.log(result[0].subscription_obj);
 					i=0;
 					while(i<result.length){
@@ -596,7 +636,7 @@ app.post('/update', urlencodedParser,function(req, res){
 			    res.redirect('../dashboard/view');
 			});
 		});
-		con.release(); // FIXME This can also potentially error. We're executing more stuff after we get results from the query which precedes this, and they make use of the connection. This is executed immidiately after the query is issued and doesn't wait for it to return. CBA to fix it rn, node callback hell :(
+		// con.release(); // FIXME This can also potentially error. We're executing more stuff after we get results from the query which precedes this, and they make use of the connection. This is executed immidiately after the query is issued and doesn't wait for it to return. CBA to fix it rn, node callback hell :(
 		});
     	
     	
@@ -636,8 +676,12 @@ app.post('/subscribe',(req,res)=>{
 			throw err;
 		}
 		//Now do whatever you want with this connection obtained from the pool
-		con.query('INSERT INTO subscriptions (subscription_obj) VALUES ?',[[[JSON.stringify(subscription)]]]);
-		con.release();
+		con.query('INSERT INTO subscriptions (subscription_obj) VALUES ?',[[[JSON.stringify(subscription)]]],(err)=>{
+			if (err) {
+				throw err;
+			}
+			con.release();
+		});
 	});
 	
 	// console.log(subscription);
@@ -666,8 +710,12 @@ app.post('/unsubscribe',(req,res)=>{
 			throw err;
 		}
 		//Now do whatever you want with this connection obtained from the mysql_pool
-		con.query('DELETE FROM subscriptions WHERE subscription_obj =?',[[[JSON.stringify(subscription)]]]);
-		con.release();
+		con.query('DELETE FROM subscriptions WHERE subscription_obj =?',[[[JSON.stringify(subscription)]]],(err)=>{
+			if (err) {
+				throw err;
+			}
+			con.release();
+		});
 	});
 	
 	// console.log(subscription);
@@ -698,8 +746,9 @@ app.post('/add_coordinator', urlencodedParser,function(req, res) {
 			if (err) throw err;
 			console.log("Coordinator Added");
 			res.redirect('/dashboard/admin');
+			con.release();
 		});	
-		con.release();
+		
 	});
 	
 	
