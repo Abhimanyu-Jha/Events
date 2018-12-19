@@ -96,30 +96,30 @@ function deleteOldEvents(){
 			};
 			var i=0;
 			imgpaths=[];
-			while(i<result.length){
+			while(i<result.length) {
 				imgpaths.push(result[i].img)
 				i++;
 			}
 			// console.log(imgpaths)
 
 			sql="DELETE FROM event_data WHERE date < '"+curr_date_time+"' ;"
-			con.query(sql,function(){
-			// console.log('Old Events Deleted');
+			con.query(sql, function() {
+				con.release();
+				// console.log('Old Events Deleted');
 
-			// ALSO DELETE OLD PIXXXXXXXXX
-			rootdir=__dirname;
-			i=0;
-			while(i<imgpaths.length){
-				fs.unlink(rootdir+'/images/'+imgpaths[i],(err)=>{
-				if(err) throw err;
-				});
-				i++;
-			}
+				// ALSO DELETE OLD PIXXXXXXXXX
+				rootdir=__dirname;
+				i=0;
+				while(i<imgpaths.length){
+					fs.unlink(rootdir+'/images/'+imgpaths[i],(err)=>{
+					if(err) throw err;
+					});
+					i++;
+				}
 			
 			});
 
 		});
-		con.release();
 	});
 
 
@@ -595,7 +595,7 @@ app.post('/update', urlencodedParser,function(req, res){
 			    res.redirect('../dashboard/view');
 			});
 		});
-		con.release();
+		con.release(); // FIXME This can also potentially error. We're executing more stuff after we get results from the query which precedes this, and they make use of the connection. This is executed immidiately after the query is issued and doesn't wait for it to return. CBA to fix it rn, node callback hell :(
 		});
     	
     	
