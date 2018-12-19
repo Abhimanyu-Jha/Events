@@ -1,8 +1,16 @@
 const router = require('express').Router();
 const passport =require('passport');
-
+const authCheck = (req,res,next)=>{
+	if(req.user){
+		club=req.user.club
+		res.redirect('/dashboard/'+club);
+	}
+	else{
+		next();
+	}
+}
 //auth login
-router.get('/login', (req,res)=>{
+router.get('/login',authCheck,(req,res)=>{
 	rootdir=__dirname;
 	rootdir=rootdir.substring(0,rootdir.length -7);
 	res.sendFile(rootdir+'/login.html');

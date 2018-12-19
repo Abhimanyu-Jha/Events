@@ -285,9 +285,10 @@ app.get('/knowmore/:key',function(req,res){
 		con.release();
 	});
 });
-app.get('/login',function(req,res){
-	res.sendFile(__dirname +'/login.html')
-});
+// app.get('/login',authCheck,function(req,res){
+
+// 	res.sendFile(__dirname +'/dashboard.html')
+// });
 
 
 
