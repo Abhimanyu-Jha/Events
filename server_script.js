@@ -91,8 +91,7 @@ function deleteOldEvents(){
 		con.query(sql,function(err,result){
 			if (err) {
 				console.log('oops');
-				con_delete.release();
-				setTimeout(startConnection,2000);
+				con.release();
 				return;
 			};
 			var i=0;
