@@ -357,3 +357,22 @@ font-family: 'Roboto';
   padding:8px;
   text-align: center;
 }
+
+.abhimanyu{
+  cursor:pointer;
+  color: #FFAABB;
+  
+
+}
+:hover.abhimanyu{
+  color:#c0425d;
+}
+
+.abhimanyu-box{
+  position:inherit;
+  bottom: 5px;  
+  width:auto;
+  text-align: center;
+  line-height: 15px;
+  align-self: center;
+}
