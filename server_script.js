@@ -311,6 +311,7 @@ app.get('/knowmore/:key',function(req,res){
 // USE THIS FOR UPLOADING ON SERVER
 app.use(fileUpload());
 app.post('/upload', urlencodedParser,function(req, res) {
+	console.log(req.user.club,' added an event');
 	if (!req.files)
 		return res.status(400).send('No files were uploaded.');
     	getConnection(function(err, con){
@@ -328,7 +329,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 			    } 
 			    
 			    if(result.length==0){
-			    	console.log('DB is empty')
+			    	console.log('DB is empty, resetting AUTO_INCREMENT')
 			    	con.query('ALTER TABLE event_data AUTO_INCREMENT = 1;',(err)=>{
 			    		if (err) {
 			    			con.release();
@@ -338,19 +339,19 @@ app.post('/upload', urlencodedParser,function(req, res) {
 			    	})
 			    	var key=1;
 			    }else{
-			    	console.log('The last record is');
-			    	console.log(result[result.length-1]);
+			    	// console.log('The last record is');
+			    	// console.log(result[result.length-1]);
 			   		prevkey=result[result.length-1].event_key;
 			    	var key=prevkey+1;
 			    }
 			    
 			
-				console.log('key is '+key);
+				// console.log('key is '+key);
 				event_image=req.files.event_image;
 			
 				filename=req.files.event_image.name;
 				extension=filename.slice(filename.indexOf('.'));
-				console.log(filename);
+				// console.log(filename);
 				// console.log(extension);
 				event_image.mv(__dirname+'/images/'+key+extension, function(err) {
 			    	if (err)
@@ -477,7 +478,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 							i=0;
 							while(i<result.length){
 								subscription = JSON.parse(result[i].subscription_obj);
-								webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
+								webpush.sendNotification(subscription,payload).catch(err=> console.error('webpush err'));
 								i++;
 							}
 							
@@ -492,6 +493,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 
 // USE THIS FOR UPDATING ON SERVER
 app.post('/update', urlencodedParser,function(req, res){
+	console.log(req.user.club,' updated an event');
 	if (!req.files){
 		console.log('Image not specified');
 	}
@@ -531,7 +533,7 @@ app.post('/update', urlencodedParser,function(req, res){
 				filename= req.files.event_image.name;
 				extension=filename.slice(filename.indexOf('.'));
 				event_imgpath=event_key+extension;
-				console.log(event_imgpath);
+				// console.log(event_imgpath);
 
 				event_image.mv(__dirname+'/images/'+event_imgpath, function(err) {
 					if (err)
@@ -629,7 +631,7 @@ app.post('/update', urlencodedParser,function(req, res){
 					i=0;
 					while(i<result.length){
 						subscription = JSON.parse(result[i].subscription_obj);
-						webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
+						webpush.sendNotification(subscription,payload).catch(err=> console.error('webpush err'));
 						i++;
 					}
 				});
@@ -684,7 +686,7 @@ app.post('/subscribe',(req,res)=>{
 		});
 	});
 	
-	// console.log(subscription);
+	console.log('Subscription added');
 	//Resource created
 	res.status(201).json({});
 
@@ -699,7 +701,7 @@ app.post('/subscribe',(req,res)=>{
 	});
 
 	// pass object into sendNotificaton
-	webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
+	webpush.sendNotification(subscription,payload).catch(err=> console.error('webpush err'));
 });
 //unsubscribe route
 app.post('/unsubscribe',(req,res)=>{

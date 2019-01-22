@@ -231,7 +231,7 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 				con.release();
 				throw err;
 			}
-		console.log(result[0].img);
+		// console.log(result[0].img);
 		event_name = result[0].title;
 		club=result[0].club;
 		event_venue=result[0].venue;

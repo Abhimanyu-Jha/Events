@@ -3,16 +3,6 @@ const GoogleStrategy = require('passport-google-oauth20');
 const keys =require('./keys')
 const mysql = require('mysql');
 var getConnection = require('../db_pool');
-// var con = mysql.createConnection({
-// 			host: keys.database.ip,
-// 			user: keys.database.user,
-// 			password: keys.database.password,
-// 			database: keys.database.db
-// 		});
-// con.connect();
-// con.on('error',function(){
-// 	console.log('hi error #2')
-// });
 
 passport.serializeUser((user,done)=>{
 	done(null,user.user_id);
