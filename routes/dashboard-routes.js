@@ -7,11 +7,13 @@ const webpush = require('web-push');
 var getConnection = require('../db_pool');
 
 const authCheck = (req,res,next)=>{
-	if(!req.user){
+	console.log(req.session);
+	if(!req.session.usernameser){
 		res.redirect('/auth/login');
 
-	}else if(!req.user.superuser==1){
-		club=req.user.club
+
+	}else if(!req.session.user.superuser==1){
+		club=req.session.user.club
 		res.redirect('/dashboard/'+club);
 	}
 	else{
@@ -48,7 +50,7 @@ router.get('/admin',authCheck,(req,res)=>{
 router.get('/:club',(req,res)=>{
 	if(!req.user){
 		res.redirect('/auth/login');
-	}else if(req.params.club!=req.user.club){
+	}else if(req.params.club!=req.session.user.club){
 		res.redirect('/dashboard/'+req.user.club);
 	}else{
 		res.render('cc_dashboard',{club: req.params.club,dp: req.user.thumbnail });
@@ -300,12 +302,12 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 					i=0;
 					while(i<result.length){
 						subscription = JSON.parse(result[i].subscription_obj);
-						webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
+						webpush.sendNotification(subscription,payload).catch(err=> console.error('webpush err'));
 						i++;
 					}
 					
 				});
-				console.log(rootdir+'/images/'+imgpath)
+				// console.log(rootdir+'/images/'+imgpath)
 				res.redirect('/dashboard/view');
 			});
 			
@@ -331,7 +333,7 @@ router.get('/:club/delete/:key',function(req,res){
 						con.release();
 						throw err;
 					}
-				console.log(result[0].img);
+				// console.log(result[0].img);
 				event_name = result[0].title;
 				club=result[0].club;
 				event_venue=result[0].venue;
@@ -399,12 +401,12 @@ router.get('/:club/delete/:key',function(req,res){
 							i=0;
 							while(i<result.length){
 								subscription = JSON.parse(result[i].subscription_obj);
-								webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
+								webpush.sendNotification(subscription,payload).catch(err=> console.error('webpush err'));
 								i++;
 							}
 							
 						});
-						console.log(rootdir+'/images/'+imgpath)
+						// console.log(rootdir+'/images/'+imgpath)
 						res.redirect('/dashboard/'+club+'/view');
 				});
 				

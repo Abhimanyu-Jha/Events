@@ -16,6 +16,9 @@ router.get('/login',authCheck,(req,res)=>{
 	res.sendFile(rootdir+'/login.html');
 });
 
+
+
+
 //auth with google
 router.get('/google', passport.authenticate('google',{
 	scope:['profile'],
@@ -25,10 +28,7 @@ router.get('/google', passport.authenticate('google',{
 //callback route for google redirect
 router.get('/google/redirect', passport.authenticate('google',
 	{successRedirect:'/dashboard/admin', failureRedirect: '/auth/login'})
-// 	function(req, res) {
-// 		if (!user) { return res.redirect('/login'); }
-// 		res.redirect('/dashboard');
-// }
+
 
 );
 

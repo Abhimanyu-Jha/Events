@@ -17,16 +17,20 @@ const passport = require('passport');
 
 var getConnection = require('./db_pool');
 
+//GOOGLE OAUTH THINGS
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client(keys.google.clientID);
+const fetch = require('node-fetch');
 
-const authCheck = (req,res,next)=>{
-	if(!req.user){
-		res.redirect('/auth/login');
-	}else if(!req.user.superuser==1){
-		res.redirect('/auth/login');
-	}else{
-		next();
-	}
-}
+// const authCheck = (req,res,next)=>{
+// 	if(!req.user){
+// 		res.redirect('/auth/login');
+// 	}else if(!req.user.superuser==1){
+// 		res.redirect('/auth/login');
+// 	}else{
+// 		next();
+// 	}
+// }
 
 //send encrypted cookie to browser
 app.use(cookieSession({
@@ -35,8 +39,8 @@ app.use(cookieSession({
 }));
 
 //initialize passport
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 
 app.set('view engine','ejs');
@@ -128,6 +132,11 @@ function deleteOldEvents(){
 }
 setInterval(deleteOldEvents,1000);
 
+function validateUser(json,req){
+	
+};
+
+
 //SERVING STATIC CONTENT
 app.use('/css',express.static('css'));
 app.use('/js',express.static('js'));
@@ -141,6 +150,65 @@ app.use(bodyParser.json());
 app.get('/',function(req,res){
 	res.sendFile(__dirname +'/index.html')
 });
+// BASIC PROFILE INFO FROM GOOGLE LOGIN
+app.post('/auth/profile',urlencodedParser,function(req, res) {
+	res.send({Message:'Received ID Token from client succesfully'});
+	
+	id_token=req.body.id_token
+	// console.log(id_token);
+	//TIME TO CHECK INTEGRITY OF TOKEN RECEIVED
+	fetch('https://oauth2.googleapis.com/tokeninfo?id_token='+id_token)
+    .then((res,err) =>{
+    	req.session.user=null;
+    	if (res.ok) {
+    		return res.json();
+    	}else{
+    		throw err;
+    	}
+    })
+    .then(json => {
+    	// NOW CHECK json.aud==app client ID
+    	if (json.aud==keys.google.clientID) {
+    		//Assign session variable if id in database
+    		var sql1= "SELECT * FROM users WHERE user_id = "+json.sub;
+			//VALIDATE USER AND GENERATE SESSION
+			getConnection(function(err, con){
+				if (err) {
+						throw err;
+					}
+					//Now do whatever you want with this connection obtained from the pool
+					con.query(sql1, function (err, result) {
+						con.release();	
+					    if (err) throw err;
+					    // console.log(result);
+					    if(result.length!=0){
+					    	console.log("************************");
+					    	console.log('Welcome user > ' + result[0].username+ ' ('+result[0].club+')');
+					    	console.log("************************");
+
+					    	//GENEREATE SESSION 
+					    	req.session.user=result[0];
+					    }else{
+
+					  		console.log('************************');
+					  		console.log('You are not authorised!!');
+					  		console.log('************************');
+					    }
+					});	
+			});
+    	}else{
+    		console.log('Client ID of token is different');
+    	}
+    	
+    	
+    }).catch(err=>{
+    	console.log(err);
+    });
+});
+
+
+
+
 //SERVING JSON DB DATA
 app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
 	getConnection(function(err, con){
@@ -298,6 +366,7 @@ app.get('/knowmore/:key',function(req,res){
 
 // 	res.sendFile(__dirname +'/dashboard.html')
 // });
+
 
 
 
