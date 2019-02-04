@@ -34,6 +34,8 @@ const fetch = require('node-fetch');
 
 //send encrypted cookie to browser
 app.use(cookieSession({
+	secure:false,
+	overwrite: false,
 	maxAge : 24*60*60*1000, // in miliseconds
 	keys: [keys.session.cookieKey]
 }));
@@ -188,6 +190,8 @@ app.post('/auth/profile',urlencodedParser,function(req, res) {
 
 					    	//GENEREATE SESSION 
 					    	req.session.user=result[0];
+					    	console.log(req.session);
+					    	// res.redirect('/dashboard/'+req.session.user.club);
 					    }else{
 
 					  		console.log('************************');
@@ -211,6 +215,7 @@ app.post('/auth/profile',urlencodedParser,function(req, res) {
 
 //SERVING JSON DB DATA
 app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
+	// console.log(req.session);
 	getConnection(function(err, con){
 		if (err) {
 			throw err;
