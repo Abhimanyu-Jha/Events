@@ -143,9 +143,7 @@ self.addEventListener('fetch', function(event) {
                     }).catch(err=>console.log(err))
                 })
             )
-    }
-
-    
+    }    
 });
 
 

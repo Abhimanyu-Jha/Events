@@ -5,7 +5,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#C2185B"/>
-  
+  <!-- GOOGLE SIGN IN CLIENT INFO -->
+  <meta name="google-signin-client_id" content="322942044904-vcah36c31slar1um35tr11piu7uns3f6.apps.googleusercontent.com">
+
   <!-- Material Icons Stylesheet-->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
    <!-- Material Design Stylesheet-->
@@ -42,7 +44,7 @@
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
                       mdl-textfield--floating-label mdl-textfield--align-right">
             <i class="material-icons" onClick="document.location.reload()">refresh</i>
-            <i class="material-icons" onClick="location.href='/auth/logout'">power_settings_new</i>
+            <i class="material-icons" onClick="signOut();">power_settings_new</i>
             
           </div>
           
@@ -156,5 +158,31 @@
 
 <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 
+
+<script type="text/javascript">
+function signOut() {
+
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+    console.log('User signed out.');
+    });
+
+    var url = '/auth/signOut';
+    fetch(url,{method: 'GET'})
+    .then(response => console.log('Success:', response))
+    .catch(error => console.error('Error:', error));
+
+    window.location = "/";
+
+
+}
+function onLoad() {
+    gapi.load('auth2', function() {
+       gapi.auth2.init();
+    });
+}
+
+</script>
+<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 </body>
 </html>

@@ -10,17 +10,14 @@ const webpush = require('web-push');
 
 const authRoutes = require('./routes/auth-routes');
 const dashboardRoutes = require('./routes/dashboard-routes');
-const passportSetup = require('./config/passport-setup')
+// const passportSetup = require('./config/passport-setup')
 const keys = require('./config/keys')
 const cookieSession =require('cookie-session');
-const passport = require('passport');
+// const passport = require('passport');
 
 var getConnection = require('./db_pool');
 
-//GOOGLE OAUTH THINGS
-const {OAuth2Client} = require('google-auth-library');
-const client = new OAuth2Client(keys.google.clientID);
-const fetch = require('node-fetch');
+
 
 // const authCheck = (req,res,next)=>{
 // 	if(!req.user){
@@ -35,7 +32,7 @@ const fetch = require('node-fetch');
 //send encrypted cookie to browser
 app.use(cookieSession({
 	secure:false,
-	overwrite: false,
+	overwrite: true,
 	maxAge : 24*60*60*1000, // in miliseconds
 	keys: [keys.session.cookieKey]
 }));
@@ -59,6 +56,7 @@ getConnection(function(err, con){
 });
 
 
+
 //DELETE OLD EVENTS
 function deleteOldEvents(){
 	var today = new Date();
@@ -71,71 +69,67 @@ function deleteOldEvents(){
 	var ss = today.getSeconds();
 
 	if(dd<10){
-		dd='0'+dd;
+	dd='0'+dd;
 	} 
 	if(mm<10){
-		mm='0'+mm;
+	mm='0'+mm;
 	}
 	if(min<10){
-		min='0'+min;
+	min='0'+min;
 	}
 	var curr_date = yyyy+'-'+mm+'-'+dd;
 	var curr_time = hh+':'+min+':'+ss;
 	var curr_date_time= curr_date+' '+curr_time;
-// console.log('Current Date Time > '+curr_date_time);
+	// console.log('Current Date Time > '+curr_date_time);
 
 	getConnection(function(err, con){
-		if (err) {
-			// throw err;
-			return;			
-		}
-		// console.log('Connected to DB');
+	if (err) {
+	// throw err;
+	return;			
+	}
+	// console.log('Connected to DB');
 
-		//Now do whatever you want with this connection obtained from the pool
+	//Now do whatever you want with this connection obtained from the pool
 
-		sql="SELECT * FROM event_data WHERE date < '"+curr_date_time+"' ;";
-		con.query(sql,function(err,result){
-			if (err) {
-				console.log('oops');
-				con.release();
-				return;
-			};
-			var i=0;
-			imgpaths=[];
-			while(i<result.length) {
-				imgpaths.push(result[i].img)
-				i++;
-			}
-			// console.log(imgpaths)
+	sql="SELECT * FROM event_data WHERE date < '"+curr_date_time+"' ;";
+	con.query(sql,function(err,result){
+	if (err) {
+	console.log('oops');
+	con.release();
+	return;
+	};
+	var i=0;
+	imgpaths=[];
+	while(i<result.length) {
+	imgpaths.push(result[i].img)
+	i++;
+	}
+	// console.log(imgpaths)
 
-			sql="DELETE FROM event_data WHERE date < '"+curr_date_time+"' ;"
-			con.query(sql, function() {
-				con.release();
-				// console.log('Old Events Deleted');
+	sql="DELETE FROM event_data WHERE date < '"+curr_date_time+"' ;"
+	con.query(sql, function() {
+	con.release();
+	// console.log('Old Events Deleted');
 
-				// ALSO DELETE OLD PIXXXXXXXXX
-				rootdir=__dirname;
-				i=0;
-				while(i<imgpaths.length){
-					fs.unlink(rootdir+'/images/'+imgpaths[i],(err)=>{
-					if(err) throw err;
-					});
-					i++;
-				}
-			
-			});
+	// ALSO DELETE OLD PIXXXXXXXXX
+	rootdir=__dirname;
+	i=0;
+	while(i<imgpaths.length){
+	fs.unlink(rootdir+'/images/'+imgpaths[i],(err)=>{
+	if(err) throw err;
+	});
+	i++;
+	}
 
-		});
 	});
 
-
-
-
+	});
+	});
 }
 setInterval(deleteOldEvents,1000);
 
 function validateUser(json,req){
-	
+	//EMPTy FOR NOW
 };
 
 
@@ -150,72 +144,24 @@ app.use(bodyParser.json());
 
 //SERVING HTML PAGES
 app.get('/',function(req,res){
-	res.sendFile(__dirname +'/index.html')
-});
-// BASIC PROFILE INFO FROM GOOGLE LOGIN
-app.post('/auth/profile',urlencodedParser,function(req, res) {
-	res.send({Message:'Received ID Token from client succesfully'});
-	
-	id_token=req.body.id_token
-	// console.log(id_token);
-	//TIME TO CHECK INTEGRITY OF TOKEN RECEIVED
-	fetch('https://oauth2.googleapis.com/tokeninfo?id_token='+id_token)
-    .then((res,err) =>{
-    	req.session.user=null;
-    	if (res.ok) {
-    		return res.json();
-    	}else{
-    		throw err;
-    	}
-    })
-    .then(json => {
-    	// NOW CHECK json.aud==app client ID
-    	if (json.aud==keys.google.clientID) {
-    		//Assign session variable if id in database
-    		var sql1= "SELECT * FROM users WHERE user_id = "+json.sub;
-			//VALIDATE USER AND GENERATE SESSION
-			getConnection(function(err, con){
-				if (err) {
-						throw err;
-					}
-					//Now do whatever you want with this connection obtained from the pool
-					con.query(sql1, function (err, result) {
-						con.release();	
-					    if (err) throw err;
-					    // console.log(result);
-					    if(result.length!=0){
-					    	console.log("************************");
-					    	console.log('Welcome user > ' + result[0].username+ ' ('+result[0].club+')');
-					    	console.log("************************");
-
-					    	//GENEREATE SESSION 
-					    	req.session.user=result[0];
-					    	console.log(req.session);
-					    	// res.redirect('/dashboard/'+req.session.user.club);
-					    }else{
-
-					  		console.log('************************');
-					  		console.log('You are not authorised!!');
-					  		console.log('************************');
-					    }
-					});	
-			});
-    	}else{
-    		console.log('Client ID of token is different');
-    	}
-    	
-    	
-    }).catch(err=>{
-    	console.log(err);
-    });
+	res.sendFile(__dirname +'/index.html');
 });
 
 
+app.get('/clubs',(req,res)=>{
+	console.log('clubs session -');
+	console.log(req.session);
+	res.send('clubs route');
 
+})
+// app.get('/del',(req,res)=>{
+// 	req.session=null;
+// 	res.send('del route');
+// })
 
 //SERVING JSON DB DATA
 app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
-	// console.log(req.session);
+
 	getConnection(function(err, con){
 		if (err) {
 			throw err;
@@ -367,17 +313,6 @@ app.get('/knowmore/:key',function(req,res){
 		
 	});
 });
-// app.get('/login',authCheck,function(req,res){
-
-// 	res.sendFile(__dirname +'/dashboard.html')
-// });
-
-
-
-
-
-
-
 
 
 //FORM SUBMIT
@@ -719,21 +654,9 @@ app.post('/update', urlencodedParser,function(req, res){
     }
 });
 
-
-
-
 // Setting up routes
 app.use('/auth',authRoutes);
 app.use('/dashboard',dashboardRoutes);
-
-
-
-
-
-
-
-
-
 
 //PUSH NOTIFS
 
@@ -777,6 +700,7 @@ app.post('/subscribe',(req,res)=>{
 	// pass object into sendNotificaton
 	webpush.sendNotification(subscription,payload).catch(err=> console.error('webpush err'));
 });
+
 //unsubscribe route
 app.post('/unsubscribe',(req,res)=>{
 
@@ -829,16 +753,6 @@ app.post('/add_coordinator', urlencodedParser,function(req, res) {
 	
 	
 });
-
-
-
-
-
-
-
-
-
-
 
 
 // 404 if no other route

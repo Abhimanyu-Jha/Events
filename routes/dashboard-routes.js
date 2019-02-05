@@ -7,8 +7,8 @@ const webpush = require('web-push');
 var getConnection = require('../db_pool');
 
 const authCheck = (req,res,next)=>{
-	console.log(req.session);
-	if(!req.session.usernameser){
+	// console.log(req.session);
+	if(!req.session.user){
 		res.redirect('/auth/login');
 
 
@@ -51,9 +51,9 @@ router.get('/:club',(req,res)=>{
 	if(!req.user){
 		res.redirect('/auth/login');
 	}else if(req.params.club!=req.session.user.club){
-		res.redirect('/dashboard/'+req.user.club);
+		res.redirect('/dashboard/'+req.session.user.club);
 	}else{
-		res.render('cc_dashboard',{club: req.params.club,dp: req.user.thumbnail });
+		res.render('cc_dashboard',{club: req.params.club,dp: req.session.user.thumbnail });
 	}
 	
 });

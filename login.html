@@ -127,7 +127,7 @@
       
       <center>
         <div id="my-signin2" data-onsuccess="onSignIn"></div>  
-        <a href="#" onclick="signOut();">Sign out</a>
+        <!-- <a onclick="signOut();" href="#" >Sign out</a> -->
       </center>
 
 
@@ -135,62 +135,89 @@
       
       <p class="mt-5 mb-3 text-muted">Login page for club administrators to add, view, update or delete events.</p>
     </form>
-    <script type="text/javascript">
-      function onSignIn(googleUser) {
-
-        var profile = googleUser.getBasicProfile();
-        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-        console.log('Name: ' + profile.getName());
-        console.log('Image URL: ' + profile.getImageUrl());
-        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-        // console.log('Id Token'+ googleUser.getAuthResponse().id_token);
 
 
-        var url = '/auth/profile';
-        var info = {id: profile.getId(),name: profile.getName(),img_url:profile.getImageUrl(),email:profile.getEmail(),id_token: googleUser.getAuthResponse().id_token};
-
-        fetch(url, {
-          method: 'POST', // or 'PUT'
-          body: JSON.stringify(info), // data can be `string` or {object}!
-          headers:{
-            'Content-Type': 'application/json'
-          }
-        })
-        // .then(res => res.json())
-        .then(response => console.log('Success:', JSON.stringify(response)))
-        .catch(error => console.error('Error:', error));
+<!-- <button id="demo-show-toast" class="mdl-button mdl-js-button mdl-button--raised" type="button">Show Toast</button> -->
+<div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+  <div class="mdl-snackbar__text"></div>
+  <button class="mdl-snackbar__action" type="button"></button>
+</div>
 
 
 
+<script type="text/javascript">
+
+// TOAST FOR UNAUTHORISED USER
+function generateToast(){
+  var snackbarContainer = document.querySelector('#demo-toast-example');
+  var showToastButton = document.querySelector('#demo-show-toast');  
+  var data = {message: 'You Are Not Authorised'};
+  snackbarContainer.MaterialSnackbar.showSnackbar(data);
+};
 
 
+function onSignIn(googleUser) {
+
+  var profile = googleUser.getBasicProfile();
+  console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+  console.log('Name: ' + profile.getName());
+  console.log('Image URL: ' + profile.getImageUrl());
+  console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+  // console.log('Id Token'+ googleUser.getAuthResponse().id_token);
 
 
+  var url = '/auth/signIn';
+  var info = {id: profile.getId(),name: profile.getName(),img_url:profile.getImageUrl(),email:profile.getEmail(),id_token: googleUser.getAuthResponse().id_token};
 
-
-      }
-      function signOut() {
-        var auth2 = gapi.auth2.getAuthInstance();
-        auth2.signOut().then(function () {
-          console.log('User signed out.');
-          });
-        }
-    function onFailure(error) {
-      console.log(error);
+  fetch(url, {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(info), // data can be `string` or {object}!
+    headers:{
+      'Content-Type': 'application/json'
     }
-      function renderButton() {
-        gapi.signin2.render('my-signin2', {
-          'scope': 'profile email',
-          'width': 240,
-          'height': 50,
-          'longtitle': true,
-          'theme': 'dark',
-          'onsuccess': onSignIn,
-          'onfailure': onFailure
-        });
-      }
+  }).then(response=>response.json())
+  .then((response)=>{
+    if(response['authorised']=='yes'){
+      window.location = "/dashboard/admin/"; 
+    }else{
+      console.log('UNAUTHORISED USER');
+      //Possibly generate toast
+      generateToast();
+      signOut();
+    }
+    
+  })          
+  // .then(response => console.log('Success, Club:', JSON.stringify(response)))
+  .catch(error => console.error('Error:', error));
+}
+function signOut() {
 
-    </script>
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    console.log('User signed out.');
+    });
+
+  var url = '/auth/signOut';
+  fetch(url,{method: 'GET'})
+  .then(response => console.log('Success:', response))
+  .catch(error => console.error('Error:', error));
+}
+function onFailure(error) {
+  console.log(error);
+}
+function renderButton() {
+  gapi.signin2.render('my-signin2', {
+    'scope': 'profile email',
+    'width': 240,
+    'height': 50,
+    'longtitle': true,
+    'theme': 'dark',
+    'onsuccess': onSignIn,
+    'onfailure': onFailure
+  });
+}
+
+</script>
 
 
 
