@@ -126,7 +126,8 @@ function deleteOldEvents(){
 	});
 	});
 }
-setInterval(deleteOldEvents,1000);
+// DAILY CLEANUP (EVERY 24 HOURS DELETE OLD EVENTS)
+setInterval(deleteOldEvents,24*60*60*1000);
 
 function validateUser(json,req){
 	//EMPTy FOR NOW
