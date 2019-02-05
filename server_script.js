@@ -175,6 +175,7 @@ app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE
 		    	throw err;
 		    }
 		    con.release();
+	
 		    var today = new Date();
 			var dd = today.getDate();
 			var mm = today.getMonth()+1; //January is 0!
@@ -320,7 +321,7 @@ app.get('/knowmore/:key',function(req,res){
 // USE THIS FOR UPLOADING ON SERVER
 app.use(fileUpload());
 app.post('/upload', urlencodedParser,function(req, res) {
-	console.log(req.user.club,' added an event');
+	console.log(req.session.user.club,' added an event');
 	if (!req.files)
 		return res.status(400).send('No files were uploaded.');
     	getConnection(function(err, con){
@@ -405,8 +406,8 @@ app.post('/upload', urlencodedParser,function(req, res) {
 				var curr_date_time= curr_date+' '+curr_time;
 				// var club =details.club;
 
-				if(!req.user.superuser==1){
-					club=req.user.club
+				if(!req.session.user.superuser==1){
+					club=req.session.user.club
 				}else{
 					club =details.club
 				}
@@ -502,7 +503,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 
 // USE THIS FOR UPDATING ON SERVER
 app.post('/update', urlencodedParser,function(req, res){
-	console.log(req.user.club,' updated an event');
+	console.log(req.session.user.club,' updated an event');
 	if (!req.files){
 		console.log('Image not specified');
 	}

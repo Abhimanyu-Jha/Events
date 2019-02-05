@@ -45,10 +45,9 @@ router.get('/admin',authCheck,(req,res)=>{
 	rootdir=__dirname;
 	rootdir=rootdir.substring(0,rootdir.length -7);
 	res.sendFile(rootdir+'/dashboard.html');
-	// res.send('you are logged in ' + req.user.username);
 });
 router.get('/:club',(req,res)=>{
-	if(!req.user){
+	if(!req.session.user){
 		res.redirect('/auth/login');
 	}else if(req.params.club!=req.session.user.club){
 		res.redirect('/dashboard/'+req.session.user.club);
@@ -65,10 +64,10 @@ router.get('/admin/add',authCheck,(req,res)=>{
 	res.sendFile(rootdir+'/add_form.html');
 });
 router.get('/:club/add',(req,res)=>{
-	if(!req.user){
+	if(!req.session.user){
 		res.redirect('/auth/login');
-	}else if(req.params.club!=req.user.club){
-		res.redirect('/dashboard/'+req.user.club);
+	}else if(req.params.club!=req.session.user.club){
+		res.redirect('/dashboard/'+req.session.user.club);
 	}else{
 		res.render('cc_add_form',{club: req.params.club, });
 	}
@@ -135,10 +134,10 @@ router.get('/admin/edit/:key',authCheck,function(req,res){
 	});
 });
 router.get('/:club/edit/:key',function(req,res){
-	if(!req.user){
+	if(!req.session.user){
 		res.redirect('/auth/login');
-	}else if(req.params.club!=req.user.club){
-		res.redirect('/dashboard/'+req.user.club);
+	}else if(req.params.club!=req.session.user.club){
+		res.redirect('/dashboard/'+req.session.user.club);
 	}else{
 		getConnection(function(err, con){
 			if (err) {
@@ -204,17 +203,16 @@ router.get('/:club/edit/:key',function(req,res){
 
 //VIEW EVENTS
 router.get('/admin/view',authCheck,(req,res)=>{
-	// console.log(req.user)
 	rootdir=__dirname;
 	rootdir=rootdir.substring(0,rootdir.length -7);
 	res.sendFile(rootdir+'/view_events.html');
 	
 });
 router.get('/:club/view',(req,res)=>{
-	if(!req.user){
+	if(!req.session.user){
 		res.redirect('/auth/login');
-	}else if(req.params.club!=req.user.club){
-		res.redirect('/dashboard/'+req.user.club);
+	}else if(req.params.club!=req.session.user.club){
+		res.redirect('/dashboard/'+req.session.user.club);
 	}else{
 		res.render('cc_view_events',{club: req.params.club});
 	}
@@ -318,10 +316,10 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 });
 
 router.get('/:club/delete/:key',function(req,res){
-		if(!req.user){
+		if(!req.session.user){
 			res.redirect('/auth/login');
-		}else if(req.params.club!=req.user.club){
-			res.redirect('/dashboard/'+req.user.club);
+		}else if(req.params.club!=req.session.user.club){
+			res.redirect('/dashboard/'+req.session.user.club);
 		}else{
 			getConnection(function(err, con){
 				if (err) {

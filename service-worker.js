@@ -72,7 +72,7 @@ self.addEventListener('notificationclick', function(event) {
 //   );
 // });
 
-
+//EXTRA OFFLINE CAPABILITY
 self.addEventListener('fetch', function(event) {
 
     // console.log('[Service Worker]', event.request.url);
