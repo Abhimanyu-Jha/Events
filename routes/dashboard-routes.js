@@ -315,6 +315,51 @@ router.get('/admin/delete/:key',authCheck,function(req,res){
 	
 });
 
+router.get('/admin/deleteSubscriptions',authCheck,(req,res)=>{
+	getConnection(function(err, con){
+		if (err) {
+			throw err;
+		}
+		//Now do whatever you want with this connection obtained from the pool
+		const payload = JSON.stringify({
+						title: "All subscriptions deleted from server.",
+						options:{
+							body: 'Please note that the server has been refreshed. You need to re-subscribe to push notifications if you wish to continue receiving them. ',
+							icon: '/icons/events.png',
+							badge: '/icons/monochrome1.png',
+							vibrate: [500,110,500,110,450,110,200,110,170,40,450,110,200,110,170,40,500] // STAR WARS
+						}
+		});
+		con.query('SELECT * FROM subscriptions',(err,result,fields)=>{
+			if (err) {
+				con.release();
+				throw err;
+			}
+			i=0;
+			while(i<result.length){
+				subscription = JSON.parse(result[i].subscription_obj);
+				webpush.sendNotification(subscription,payload).catch(err=> console.error('webpush err'));
+				i++;
+			}
+
+		})
+		
+		con.query('truncate subscriptions', (err,result,fields)=>{
+			if (err) {
+				con.release();
+				throw err;
+			}
+			console.log('Subscriptions Cleared')
+			con.release();				
+		});
+
+		res.redirect('/dashboard/admin');
+	});
+		
+});	
+	
+
+
 router.get('/:club/delete/:key',function(req,res){
 		if(!req.session.user){
 			res.redirect('/auth/login');

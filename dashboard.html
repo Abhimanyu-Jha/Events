@@ -149,6 +149,15 @@
 
         </span>
       </li>
+      <li class="mdl-list__item">
+        <span onclick= "confirmation()" class="mdl-list__item-primary-content">
+        <a class="mdl-navigation__link">
+        <i class="material-icons mdl-list__item-icon">unsubscribe</i>
+        Delete All Subscriptions
+      </a>
+
+        </span>
+      </li>
         </ul>
       </div>
 
@@ -160,6 +169,16 @@
 
 
 <script type="text/javascript">
+function confirmation(){
+  if (confirm("Are you sure?")) {
+    location.href='/dashboard/admin/deleteSubscriptions'
+  }
+}
+
+
+
+
+
 function signOut() {
 
     var auth2 = gapi.auth2.getAuthInstance();

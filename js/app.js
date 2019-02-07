@@ -321,5 +321,9 @@ app.getEvent = function(firstCall) {
 app.getEvent();
 
 
+// var socket = io.connect();
+// socket.on('disconnect', function () {
+//   alert('Socket is disconnected.');
+// });
 
 
