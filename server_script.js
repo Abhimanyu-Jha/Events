@@ -150,9 +150,9 @@ app.get('/',function(req,res){
 
 
 app.get('/clubs',(req,res)=>{
-	console.log('clubs session -');
-	console.log(req.session);
-	res.send('clubs route');
+	// console.log('clubs session -');
+	// console.log(req.session);
+	res.send('Information regarding clubs coming soon.');
 
 })
 // app.get('/del',(req,res)=>{
