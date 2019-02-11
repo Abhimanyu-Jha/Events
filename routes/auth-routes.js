@@ -20,7 +20,7 @@ const authCheck = (req,res,next)=>{
 		next();
 	}
 }
-//auth login
+//auth logi
 router.get('/login',authCheck,(req,res)=>{
 	rootdir=__dirname;
 	rootdir=rootdir.substring(0,rootdir.length -7);
@@ -108,27 +108,12 @@ router.get('/signOut',(req,res)=>{
 	res.redirect('/')
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// logging out
-router.get('/logout', (req,res)=>{
-	req.logout();
-	
+router.get('/logout',(req,res)=>{
+	req.session=null;
+	// console.log(req.session.user);
+	console.log('signOut route called');
+	// res.end();
+	res.redirect('/')
 });
 
 

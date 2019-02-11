@@ -125,27 +125,22 @@
           <li class="mdl-list__item">
             <span onclick= "location.href='/dashboard/admin/view'" class="mdl-list__item-primary-content">
             <a href="/dashboard/admin/view" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">view_list</i>
-            View Events</a>
+            Manage Events</a>
 
             </span>
           </li>
-          <li class="mdl-list__item">
-            <span onclick= "location.href='/dashboard/admin/view'" class="mdl-list__item-primary-content">
-            <a href="/dashboard/admin/view" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">mode_edit</i>
-            Edit Events</a>
-
-            </span>
-          </li><li class="mdl-list__item">
-        <span onclick= "location.href='/dashboard/admin/view'" class="mdl-list__item-primary-content">
-        <a href="/dashboard/admin/view" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">delete</i>
-        Delete Events</a>
-
-        </span>
-      </li>
+          
       <li class="mdl-list__item">
         <span onclick= "location.href='/dashboard/admin/add_coordinator'" class="mdl-list__item-primary-content">
         <a href="/dashboard/admin/add_coordinator" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">person</i>
         Add Club Coordinator</a>
+
+        </span>
+      </li>
+      <li class="mdl-list__item">
+        <span onclick= "location.href='/dashboard/admin/manage_coordinators" class="mdl-list__item-primary-content">
+        <a href="/dashboard/admin/manage_coordinators" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">create</i>
+        Manage Club Coordinators</a>
 
         </span>
       </li>
@@ -162,7 +157,15 @@
       </div>
 
 
-
+<ul class="demo-list-icon mdl-list" style='background-color: rgba(255,255,255,0.5)'>
+          
+          <li class="mdl-list__item">
+            <span class="mdl-list__item-primary-content">
+            <a href="#" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">people</i>
+            Subscribers: <div style="display: inline;" id="nos"></div></a>
+            </span>
+</li>
+</ul>
 </div><!-- Layout close-->
 
 <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
@@ -175,8 +178,14 @@ function confirmation(){
   }
 }
 
-
-
+var url = '/dashboard/nos/';
+    fetch(url,{method: 'GET'})
+    .then(response=>response.json())
+    .then(response =>{
+      console.log('Success:', response['COUNT(*)'])
+      document.getElementById('nos').innerText=response['COUNT(*)'];
+    })
+    .catch(error => console.error('Error:', error));
 
 
 function signOut() {

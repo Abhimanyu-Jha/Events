@@ -38,8 +38,58 @@ getConnection(function(err, con){
 		}
 		//Now do whatever you want with this connection obtained from the pool
 });
-
-
+// RETURN NUMBER OF SUBSCRIPTIONS
+router.get('/nos',authCheck,(req,res)=>{
+	getConnection(function(err, con){
+		if (err) {
+			con.release(); 
+			throw err;
+		}
+		//Now do whatever you want with this connection obtained from the pool
+		con.query("SELECT COUNT(*) FROM subscriptions", function (err, result, fields) {
+			if (err) {
+				con.release();
+				throw err;
+			}
+		    if (!result[0]) {
+		    	console.log('404');
+		    	res.status(400).sendFile(__dirname+'/404.html');
+		    	return;
+		    	// throw err;
+		    }
+		    // console.log(result[0]);
+		    res.json(result[0]);
+			con.release();
+		});
+		
+	});
+});
+// RETURN COORDINATORS LIST
+router.get('/coordinators',authCheck,(req,res)=>{
+	getConnection(function(err, con){
+		if (err) {
+			con.release(); 
+			throw err;
+		}
+		//Now do whatever you want with this connection obtained from the pool
+		con.query("SELECT * FROM users", function (err, result, fields) {
+			if (err) {
+				con.release();
+				throw err;
+			}
+		    if (!result[0]) {
+		    	console.log('404');
+		    	res.status(400).sendFile(__dirname+'/404.html');
+		    	return;
+		    	// throw err;
+		    }
+		    // console.log(result[0]);
+		    res.json(result);
+			con.release();
+		});
+		
+	});
+});
 //DASHBOARD MAIN
 router.get('/admin',authCheck,(req,res)=>{
 	rootdir=__dirname;
@@ -208,6 +258,11 @@ router.get('/admin/view',authCheck,(req,res)=>{
 	res.sendFile(rootdir+'/view_events.html');
 	
 });
+router.get('/admin/manage_coordinators',authCheck,(req,res)=>{
+	rootdir=__dirname;
+	rootdir=rootdir.substring(0,rootdir.length -7);
+	res.sendFile(rootdir+'/manage_coordinators.html');
+})
 router.get('/:club/view',(req,res)=>{
 	if(!req.session.user){
 		res.redirect('/auth/login');
@@ -358,6 +413,27 @@ router.get('/admin/deleteSubscriptions',authCheck,(req,res)=>{
 		
 });	
 	
+//DELETE COORDINATOR
+router.get('/coordinator_delete/:key',authCheck,function(req,res){
+	getConnection(function(err, con){
+		if (err) {
+			throw err;
+		}
+		//Now do whatever you want with this connection obtained from the pool
+		con.query("DELETE FROM users where serial_number="+req.params.key, function (err, result, fields) {
+			if (err) {
+				con.release();
+				throw err;
+			}
+			else{
+				console.log('deleted user');
+				res.redirect('/dashboard/admin/manage_coordinators')
+			}
+		});		
+
+	});
+	
+});
 
 
 router.get('/:club/delete/:key',function(req,res){
