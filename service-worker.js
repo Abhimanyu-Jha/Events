@@ -42,35 +42,40 @@ self.addEventListener('notificationclick', function(event) {
   var staticCache = 'Events-Cache-v1'
   // cache the application shell
   var filesToCache = [
-  '.',
-  '/',
-  'css/events.css',
-  'css/event_desc.css',
-  'css/mdl.css',
-  'https://fonts.googleapis.com/icon?family=Material+Icons',
-  // 'css/roboto.css',
-  'https://fonts.gstatic.com/s/materialicons/v38/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2',
-  'app images/drawerpic2.png',
+  // '.',
+  // '/',
+  // // 'css',
+  // // 'css/event_desc.css',
+  // // 'css/mdl.css',
+  // // 'https://fonts.googleapis.com/icon?family=Material+Icons',
+  // // 'https://fonts.gstatic.com/s/materialicons/v38/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2',
+  // // 'app images/drawerpic2.png',
   'index.html',
-  'js/app.js',
-  'js/mdl.js',
-  'js/client.js',
-  '/data',
-  'manifest.json',
-  'images/91.jpg'
+  // // 'js/app.js',
+  // // 'js/mdl.js',
+  // // 'js/client.js',
+  // '/data',
+  // // 'manifest.json',
+  // // 'css/material.min.css',
+  // 'service-worker.js'
+  'icons/events.png'
   
 
   ];
 
-// self.addEventListener('install', function(event) {
-//   event.waitUntil(
-//     caches.open(staticCache).then(function(cache) {
-//         console.log('Caching Static content on SW install')
+self.addEventListener('install', function(event) {
+  event.waitUntil(
+    caches.open(staticCache).then(function(cache) {
+        console.log('Caching Static content on SW install')
 
-//         return cache.addAll(filesToCache);
-//     })
-//   );
-// });
+        return cache.addAll(filesToCache);
+    })
+  );
+});
+
+
+
+
 
 //EXTRA OFFLINE CAPABILITY
 self.addEventListener('fetch', function(event) {
@@ -121,6 +126,7 @@ self.addEventListener('fetch', function(event) {
     }
     else{
         // cache only for stuff in cache , network only for other stuff
+
         // event.respondWith(
         //    caches.match(event.request).then(function(response) {
         //     return response || fetch(event.request);
@@ -128,8 +134,8 @@ self.addEventListener('fetch', function(event) {
         // );
 
 
-        //network first then if fetch FAILS falls back to cache, 
-        //also update every request made to cache
+        // network first then if fetch FAILS falls back to cache, 
+        // also update every request made to cache
         event.respondWith(
                 fetch(event.request).catch(function() {
                     return caches.match(event.request);
