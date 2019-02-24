@@ -99,58 +99,93 @@
 
   <!-- CONTENT -->
 <main class="mdl-layout__content">
-    <form style="padding:25px;" id='uploadForm' action='/add_coordinator' 
-    method='post' encType="multipart/form-data">
+  <form style="padding:25px;" id='uploadForm' action='/add_coordinator' 
+  method='post' encType="multipart/form-data" novalidate class="needs-validation">
 
-        <div class="form-group" >
-            <label for="event-name">Club Coordinator Name</label>
-            <input type="text" name='cc_name' class="form-control" id="event-name" aria-describedby="EventName" placeholder="Enter Coordinator name">
+    <div class="form-group" >
+        <label for="event-name">Club Coordinator Name</label>
+        <input type="text" name='cc_name' class="form-control" id="event-name" aria-describedby="EventName" placeholder="Enter Coordinator name" required>
+        <div class="invalid-feedback">
+      Please Enter Coordinator's Name.
+      </div>
+    </div>
+    <div class="form-group" >
+        <label for="event-name">Google User ID</label>
+        <input type="text" name='user_id' class="form-control" id="event-name" aria-describedby="EventName" placeholder="Enter Google user ID" required>
+        <div class="invalid-feedback">
+          Please Enter Google ID
         </div>
-        <div class="form-group" >
-            <label for="event-name">Google User ID</label>
-            <input type="text" name='user_id' class="form-control" id="event-name" aria-describedby="EventName" placeholder="Enter Google user ID">
+    </div>
+
+    <div class="row form-group">
+        <div class="col-6">
+          <label for="club">Superuser</label>
+          <select name='superuser' id='club' class="custom-select" required>
+            <option selected value="0">No</option>              
+            <option value="1">Yes</option>
+          </select>
         </div>
-
-        <div class="row form-group">
-            <div class="col-6">
-              <label for="club">Superuser</label>
-              <select name='superuser' id='club' class="custom-select">
-                <option selected value="0">No</option>              
-                <option value="1">Yes</option>
-              </select>
-            </div>
-            <div class="col-6">
-              <label for="club">Club Name</label>
-              <select name='club' id='club' class="custom-select">
-              
-              <option selected value="Astronuts">Astronuts</option> 
-              <option value="Audiobytes">Audiobytes</option>
-              <option value="Byld">Byld</option>
-              <option value="Cyborg">Cyborg</option>
-              <option value="D4rkc0de">D4rkc0de</option>
-              <option value="Ecell">Ecell</option>
-              <option value="Electroholics">Electroholics</option>
-              <option value="Évariste">Évariste</option>
-              <option value="FooBar">FooBar</option>
-              <option value="Ink">Ink</option>
-              <option value="Kubic">Kubic</option>
-              <option value="Machaan">Machaan</option>
-              <option value="MadToes">MadToes</option>
-              <option value="Meraki ArtSoc">Meraki ArtSoc</option>
-              <option value="Prayaas">Prayaas</option>
-              <option value="Tasveer">Tasveer</option>
-              <option value="The 65th Square">The 65th Square</option>
-              <option value="Trivialis">Trivialis</option>
-              <option value="Voix de Literati">Voix de Literati</option>
-              <option value="Wall Street">Wall Street</option>
-              <option value="Women in Tech">Women in Tech</option>
-              </select>
-            </div>
+        <div class="col-6">
+          <label for="club">Club Name</label>
+          <select name='club' id='club' class="custom-select" required>
+          <option selected value="">Club..</option>
+          <option value="Astronuts">Astronuts</option> 
+          <option value="Audiobytes">Audiobytes</option>
+          <option value="Byld">Byld</option>
+          <option value="Cyborg">Cyborg</option>
+          <option value="D4rkc0de">D4rkc0de</option>
+          <option value="Ecell">Ecell</option>
+          <option value="Electroholics">Electroholics</option>
+          <option value="Évariste">Évariste</option>
+          <option value="FooBar">FooBar</option>
+          <option value="Ink">Ink</option>
+          <option value="Kubic">Kubic</option>
+          <option value="Machaan">Machaan</option>
+          <option value="MadToes">MadToes</option>
+          <option value="Meraki ArtSoc">Meraki ArtSoc</option>
+          <option value="Prayaas">Prayaas</option>
+          <option value="Tasveer">Tasveer</option>
+          <option value="The 65th Square">The 65th Square</option>
+          <option value="Trivialis">Trivialis</option>
+          <option value="Voix de Literati">Voix de Literati</option>
+          <option value="Wall Street">Wall Street</option>
+          <option value="Women in Tech">Women in Tech</option>
+          </select>
         </div>
+    </div>
 
 
-      <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect  mdl-button--accent">Submit</button>
-    </form>
+  <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect  mdl-button--accent">Submit</button>
+  </form>
+
+
+
+
+
+
+
+
+
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
 </main>
 
 
