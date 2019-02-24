@@ -37,7 +37,7 @@
 
         <div class="mdl-layout__header-row">
           <!-- Title -->
-          <span class="mdl-layout-title">Events</span>
+          <span class="mdl-layout-title" style="cursor:pointer" onclick="location.href='/'">Events</span>
           <div class="mdl-layout-spacer"></div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
           mdl-textfield--floating-label mdl-textfield--align-right">
@@ -134,15 +134,33 @@
 
 <div class="custom-file">
 	<div class="custom-file">
-    <input type="file" class="custom-file-input" id="event_image" name="event_image" required>
+    <input type="file" class="custom-file-input" id="event_image" name="event_image" required onchange="readURL(this);">
+    <br>
+    <!-- <p class="text-muted" style="padding-left: 5px;">960x960 works best.</p> -->
     <script type="text/javascript">
-	        document.getElementById('event_image').onchange = function() {
-	          document.querySelector('.custom-file-label').textContent=document.getElementById('event_image').files[0].name;
-	      };
-	</script>
+      document.getElementById('event_image').onchange = function() {
+      document.querySelector('.custom-file-label').textContent=document.getElementById('event_image').files[0].name;
+      readURL(this);
+      function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#blah')
+                    .attr('src', e.target.result)
+                    .width(100)
+                    .height(100);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+      }
+      };
+	  </script>
     <label class="custom-file-label" for="event-image">
-		Choose image for event
+		Use square images for best results
     </label>
+    
     <div class="invalid-feedback">Please upload and image for the event</div>
     </div>
     
@@ -155,6 +173,11 @@
 		  for best results across devices.
 </small> -->
 
+</div>
+<div class="row form-group">
+  <div class="col-12">
+    <img class="text-muted" id="blah" src="#" alt="&nbsp;&nbsp;Select an image" />
+  </div>  
 </div>
 <div class="row form-group">
     <div class="col-7">

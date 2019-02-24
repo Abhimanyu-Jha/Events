@@ -149,16 +149,12 @@ app.get('/',function(req,res){
 });
 
 
-app.get('/clubs',(req,res)=>{
-	// console.log('clubs session -');
-	// console.log(req.session);
-	res.send('Information regarding clubs coming soon.');
+// app.get('/clubs',(req,res)=>{
 
-})
-// app.get('/del',(req,res)=>{
-// 	req.session=null;
-// 	res.send('del route');
+// 	res.send('Information regarding clubs coming soon.');
+
 // })
+
 
 //SERVING JSON DB DATA
 app.get('/data',function(req,res){ //ADD authCheck MIDDLEWARE

@@ -48,7 +48,7 @@
   <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
           <!-- Title -->
-          <span class="mdl-layout-title">Events</span>
+          <span class="mdl-layout-title" style="cursor:pointer" onclick="location.href='/'">Events</span>
           <div class="mdl-layout-spacer"></div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
                       mdl-textfield--floating-label mdl-textfield--align-right">
@@ -62,7 +62,7 @@
         </div>
   </header>
 
-  <!-- DRAWER -->
+   <!-- DRAWER -->
   <div class="mdl-layout__drawer">
     <div class="drawer-pic">
     <span class="mdl-layout-title drawer-title"><h3>Events</h3></span>
@@ -71,33 +71,33 @@
     <ul class="demo-list-icon mdl-list">
       
       <li class="mdl-list__item">
-        <span class="mdl-list__item-primary-content">
+        <span onclick= "location.href='/'" class="mdl-list__item-primary-content">
         <a href="/" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">home</i>
         Home</a>
         </span>
       </li>
       <li class="mdl-list__item">
-        <span class="mdl-list__item-primary-content">
-        <a href="/login" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">account_box</i>
+        <span onclick= "location.href='/auth/login'" class="mdl-list__item-primary-content">
+        <a href="/auth/login" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">account_box</i>
         Admin Login</a>
 
         </span>
       </li>
-      <li class="mdl-list__item">
+      <li onclick= "location.href='/clubs'" class="mdl-list__item">
         <span class="mdl-list__item-primary-content">
         <a href="/clubs" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">view_headline</i>
         Clubs</a>
 
         </span>
       </li>
-      <li class="mdl-list__item notification_button">
+      <li onclick= "location.href='/dashboard/admin'" class="mdl-list__item">
         <span class="mdl-list__item-primary-content">
-        <button disabled class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-        Enable Push Messaging
-        </button>
+        <a href="/dashboard/admin" class="mdl-navigation__link"><i class="material-icons mdl-list__item-icon">dashboard</i>
+        Admin Dashboard</a>
 
         </span>
       </li>
+      
     </ul>
     <div class="mdl-card__supporting-text desc abhimanyu-box">
       <div onclick="window.open('https://www.linkedin.com/in/abhimanyu-jha/')" >Developed by <span class='abhimanyu'>Abhimanyu Jha</span>
