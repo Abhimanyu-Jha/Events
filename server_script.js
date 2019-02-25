@@ -148,6 +148,11 @@ app.get('/',function(req,res){
 	res.sendFile(__dirname +'/index.html');
 });
 
+//Google ID
+app.get('/googleID',function(req,res){
+	res.sendFile(__dirname +'/googleID.html');
+});
+
 
 // app.get('/clubs',(req,res)=>{
 

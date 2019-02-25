@@ -25,7 +25,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" sizes="192x192" href="/icons/events.png">
 
-  <title>Events Login</title>
+  <title>Events Google-ID</title>
   
   <link rel="manifest" href="/manifest.json">
   
@@ -102,7 +102,7 @@
 <!-- FORM -->
     <form class="form-signin" action='./google'>
       <img class="mb-4" src="/icons/events.png" alt="" width="100" height="100">
-      <h1 class="h3 mb-3 font-weight-normal">Login for Club admins</h1><br>
+      <h1 class="h3 mb-3 font-weight-normal">Know Your Google-ID</h1><br>
 
       <!-- <label for="inputEmail" class="sr-only">Email address</label>
       <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
@@ -133,7 +133,28 @@
 
       
       
-      <p class="mt-5 mb-3 text-muted">Login page for club administrators to add, view, update or delete events.</p>
+      <p class="mt-5 mb-3 text-muted">Send your Google-ID to the club coordinator to get admin privileges.</p>
+      <table class="table" hidden="True" id="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Email ID</th>
+            <th scope="col" id='info1'></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Google ID</th>
+            <td id='info2'></td>
+          </tr>
+         <!--  <tr onclick="copyToClipboard()">
+            <th scope="row">
+              <i class="material-icons">file_copy</i>
+              Click to copy Google ID
+            </th>
+          </tr> -->
+
+        </tbody>
+      </table>
     </form>
 
 
@@ -157,7 +178,7 @@ function generateToast(){
 
 
 function onSignIn(googleUser) {
-
+  document.getElementById('table').removeAttribute('hidden');
   var profile = googleUser.getBasicProfile();
   console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
   console.log('Name: ' + profile.getName());
@@ -165,30 +186,9 @@ function onSignIn(googleUser) {
   console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
   // console.log('Id Token'+ googleUser.getAuthResponse().id_token);
 
-
-  var url = '/auth/signIn';
-  var info = {id: profile.getId(),name: profile.getName(),img_url:profile.getImageUrl(),email:profile.getEmail(),id_token: googleUser.getAuthResponse().id_token};
-
-  fetch(url, {
-    method: 'POST', // or 'PUT'
-    body: JSON.stringify(info), // data can be `string` or {object}!
-    headers:{
-      'Content-Type': 'application/json'
-    }
-  }).then(response=>response.json())
-  .then((response)=>{
-    if(response['authorised']=='yes'){
-      window.location = "/dashboard/admin/"; 
-    }else{
-      console.log('UNAUTHORISED USER');
-      //Possibly generate toast
-      generateToast();
-      signOut();
-    }
-    
-  })          
-  // .then(response => console.log('Success, Club:', JSON.stringify(response)))
-  .catch(error => console.error('Error:', error));
+  document.getElementById('info1').textContent=profile.getEmail();
+  document.getElementById('info2').textContent=profile.getId();
+  signOut();
 }
 function signOut() {
 
