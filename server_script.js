@@ -490,7 +490,7 @@ app.post('/upload', urlencodedParser,function(req, res) {
 							i=0;
 							while(i<result.length){
 								subscription = JSON.parse(result[i].subscription_obj);
-								webpush.sendNotification(subscription,payload).catch(err=> console.error('webpush err'));
+								webpush.sendNotification(subscription,payload).catch(err=> console.error(err));
 								i++;
 							}
 							
