@@ -9,11 +9,11 @@
   "author": "abhimanyu",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.2",
+    "body-parser": "^1.20.1",
     "connect-flash": "^0.1.1",
     "cookie-session": "^2.0.0-beta.3",
     "ejs": "^2.5.9",
-    "express": "^4.16.3",
+    "express": "^4.18.2",
     "express-fileupload": "^0.4.0",
     "google-auth-library": "^3.0.1",
     "ip": "^1.1.5",
